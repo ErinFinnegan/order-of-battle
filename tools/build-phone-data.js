@@ -30,7 +30,7 @@ const slim = b => ({ id: b.id, title: b.title, author: b.author, year: b.year ||
 // Everything he has answered: the phone app learns from it but never shows these books.
 const history = E.books.filter(b => E.status(b.id)).map(b => {
   const h = { ...slim(b), s: E.status(b.id) };
-  if (h.s === "unread") h.about = cur.about[b.id] || E.aboutOf(b) || "";   // shown on his Saved list
+  if (["unread", "nope", "pass"].includes(h.s)) h.about = cur.about[b.id] || E.aboutOf(b) || "";   // shown on Saved and in "Why not?"
   return h;
 });
 

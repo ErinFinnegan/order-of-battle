@@ -19,7 +19,10 @@ artifact has both.
 
 A simpler version for Dad's Android phone: one book at a time with a large description,
 and four big buttons: **Good Book**, **Read, Don't Remember**, **Pass**, and **Save /
-Haven't Heard**. No tags or scores on screen. A **Saved** tab lists what he wants to hear,
+Haven't Heard**. No tags or scores on screen. A **Why not?** button on the Books
+screen walks back through passed books (including his earlier desktop passes) one at a
+time: *Not interested in this battle*, *Too sentimental or brutal*, *Already read it or
+saw the movie*, or *I read it, it's bad*, so a pass teaches the app something. A **Saved** tab lists what he wants to hear,
 led by confirmed audiobooks with a **Get it on Audible** button. **More places to listen**
 folds out Chirp, Everand, Spotify, Audiobooks.com, BARD, the Internet Archive, LibriVox
 (older books) and, last, Libby, since it depends on a working library card. The tab also

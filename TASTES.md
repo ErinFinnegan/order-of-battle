@@ -102,8 +102,9 @@ Fortresses*).
 - Where's the line on "too brutal"? *The Forgotten 500* (a rescue of downed airmen) is
   on his shelf as a test. *Lightning Down* (a P-38 pilot sent to Buchenwald) was taken
   off his phone shelf for now.
-- Some of his "Not this book" answers may mean "not this battle." He and Erin planned to
-  go back through them in the desktop app's Whole list view.
+- Many of his 52 "Not this book" answers are ambiguous (not this battle? too
+  sentimental? already read it?). The phone app's **Why not?** review asks him about
+  each one; update this file once those answers come back.
 
 ## Where this comes from
 

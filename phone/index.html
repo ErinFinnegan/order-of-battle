@@ -55,10 +55,16 @@ header h1{font-family:var(--display); font-size:26px; margin:0; letter-spacing:.
 .choice.good{color:var(--good)} .choice.pass{color:var(--pass)}
 .choice:active{transform:scale(.97)}
 .choice:focus-visible, .choice.kb:focus{background:var(--hl); color:var(--hl-ink); border-color:var(--hl-ink); outline:5px solid var(--ink); outline-offset:3px}
+.whybar{display:flex; width:100%; justify-content:space-between; align-items:center; gap:10px; margin-top:12px; padding:14px 16px; border-radius:12px; border:2px solid var(--ink); background:var(--card); font-size:20px; font-weight:700; cursor:pointer; text-align:left}
+.whybar span{font-weight:400; font-size:17px; color:var(--muted)}
+.whybar:focus-visible{background:var(--hl); color:var(--hl-ink); outline:4px solid var(--ink)}
+.whyq{font-size:21px; margin:14px 0 0}
+.linkback{background:none; border:none; padding:0; font-size:17px; color:var(--ink); text-decoration:underline; cursor:pointer}
+.choices.why .choice{min-height:92px; font-size:20px}
 .below{display:flex; justify-content:center; margin-top:14px; min-height:52px}
 .undo{border:2px solid var(--ink); background:transparent; border-radius:10px; padding:10px 22px; font-size:19px; font-weight:700; cursor:pointer}
 .undo:focus-visible{background:var(--hl); color:var(--hl-ink); outline:4px solid var(--ink)}
-.toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(140px + env(safe-area-inset-bottom,0px)); background:var(--ink); color:var(--paper); padding:12px 22px; border-radius:10px; font-size:19px; font-weight:700; pointer-events:none; max-width:calc(100% - 32px); text-align:center}
+.toast{position:fixed; left:50%; transform:translateX(-50%); top:calc(64px + env(safe-area-inset-top,0px)); background:var(--ink); color:var(--paper); padding:12px 22px; border-radius:10px; font-size:19px; font-weight:700; pointer-events:none; max-width:calc(100% - 32px); text-align:center}
 
 /* saved list */
 .saved h2{font-size:26px; margin:20px 0 4px}
@@ -108,7 +114,9 @@ const D = window.OOB_DATA;
 
 /* ---------- learning (same method as the desktop app, trimmed) ---------- */
 // Each answer nudges a score for every feature of that book; scores are shrunk toward zero.
-const VAL = {up:1, good:1, side:0.1, down:-1, nope:-0.2, pass:-0.4, read:0.25, forgot:0.2, nobattle:0};
+const VAL = {up:1, good:1, side:0.1, down:-1, nope:-0.2, pass:-0.4, read:0.25, forgot:0.2, nobattle:0,
+  // answers from "Why not?": tone = too sentimental or brutal, seen = already read it or saw the movie, bad = read it, it's bad
+  tone:-0.4, seen:0.25, bad:-1};
 const VAL_BY_GROUP = {nobattle:{tg:-1, th:-0.3}};
 const WEIGHT = {fe:1.3, th:1.2, br:1, fm:1, au:1.6, era:0.5, tg:0.9};
 const ERA = y => !y ? null : y<1960 ? "wartime" : y<1980 ? "60s70s" : y<2000 ? "80s90s" : y<2015 ? "2000s" : "recent";
@@ -134,7 +142,7 @@ function affinity(answers){
       (acc[f] ||= {sum:0,n:0}); acc[f].sum+=v; acc[f].n++;
     }
   };
-  D.history.forEach(b=>add(b,b.s));
+  D.history.forEach(b=>add(b, answers[b.id]?.s || b.s));
   D.shelf.forEach(b=>{ if(answers[b.id]) add(b,answers[b.id].s); });
   const out={}; for(const [f,a] of Object.entries(acc)) out[f]=a.sum/(a.n+2);
   return out;
@@ -168,7 +176,16 @@ const CHOICES = [
   {s:"save",   label:"Save / Haven't Heard",    cls:"",     key:"4",
    icon:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>'},
 ];
-const DONE_MSG = {good:"Marked as a good book", forgot:"Marked read, doesn't remember", pass:"Passed", save:"Saved for later"};
+const WHY = [
+  {s:"nobattle", label:"Not interested in this battle", cls:"", key:"1"},
+  {s:"tone",     label:"Too sentimental or brutal",     cls:"", key:"2"},
+  {s:"seen",     label:"Already read it or saw the movie", cls:"", key:"3"},
+  {s:"bad",      label:"I read it, it's bad",           cls:"pass", key:"4"},
+];
+const DONE_MSG = {good:"Marked as a good book", forgot:"Marked read, doesn't remember", pass:"Passed", save:"Saved for later",
+  nobattle:"Noted: not this battle", tone:"Noted: too sentimental or brutal", seen:"Noted: already read it", bad:"Noted: read it, it's bad"};
+const PASSED = new Set(["pass","nope"]);    // answers that get the "Why not?" follow-up
+let skipWhy = new Set();                     // passed books he skipped in "Why not?" this visit
 
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
@@ -184,6 +201,12 @@ function queue(){
   return D.shelf.filter(b=>!answers[b.id]).map(b=>({b,sc:score(b,aff)}))
     .sort((x,y)=>(y.b.audio==="yes")-(x.b.audio==="yes") || y.sc-x.sc).map(x=>x.b);
 }
+function whyBooks(){
+  const fromPhone=D.shelf.filter(b=>answers[b.id]?.s==="pass").sort((a,b)=>answers[b.id].at-answers[a.id].at);
+  const earlier=D.history.filter(b=>PASSED.has(b.s) && !answers[b.id]);
+  return [...fromPhone, ...earlier].filter(b=>!skipWhy.has(b.id));
+}
+const findBook = id => D.shelf.find(x=>x.id===id) || D.history.find(x=>x.id===id);
 function savedBooks(){
   const fromPhone=D.shelf.filter(b=>answers[b.id]?.s==="save").sort((a,b)=>answers[b.id].at-answers[a.id].at);
   const earlier=D.history.filter(b=>b.s==="unread");
@@ -196,11 +219,12 @@ function renderBooks(){
   const list=queue(), b=list[0];
   const el=$("#viewBooks");
   if(!b){
-    el.innerHTML=`<div class="done"><p><b>That's every book for now.</b></p><p>Check the Saved list, and send your answers to Erin so she can find more.</p></div>${undoHtml()}`;
+    el.innerHTML=`${whyBar()}<div class="done"><p><b>That's every book for now.</b></p><p>Check the Saved list, and send your answers to Erin so she can find more.</p></div>${undoHtml()}`;
     return;
   }
   el.innerHTML=`
     <div class="togo">${list.length} book${list.length===1?"":"s"} to go</div>
+    ${whyBar()}
     <article class="book" data-id="${esc(b.id)}">
       <h2><mark>${esc(b.title)}</mark></h2>
       <div class="by">${esc(b.author)}${b.year?` · ${b.year}`:""}</div>
@@ -211,6 +235,31 @@ function renderBooks(){
       ${CHOICES.map((c,i)=>`<button class="choice ${c.cls}${kb?" kb":""}" data-s="${c.s}" data-i="${i}">${c.icon}<span>${c.label}</span></button>`).join("")}
     </div>
     ${undoHtml()}`;
+  if(kb) el.querySelectorAll(".choice")[sel]?.focus();
+}
+function whyBar(){
+  const n=whyBooks().length;
+  return n ? `<button class="whybar" id="whyBtn">Why not? <span>${n} passed book${n===1?"":"s"} to explain</span></button>` : "";
+}
+function renderWhy(){
+  const list=whyBooks(), b=list[0];
+  const el=$("#viewBooks");
+  if(!b){
+    el.innerHTML=`<div class="done"><p><b>All caught up.</b></p><p>Thanks. That helps a lot.</p><p><button class="undo" id="backBooks">Back to books</button></p></div>${undoHtml()}`;
+    return;
+  }
+  el.innerHTML=`
+    <div class="togo"><button class="linkback" id="backBooks">← Back to books</button> · ${list.length} to go</div>
+    <p class="whyq">You passed on this one. <b>Why not?</b></p>
+    <article class="book" data-id="${esc(b.id)}">
+      <h2><mark>${esc(b.title)}</mark></h2>
+      <div class="by">${esc(b.author)}${b.year?` · ${b.year}`:""}</div>
+      ${b.about?`<p class="about">${esc(b.about)}</p>`:""}
+    </article>
+    <div class="choices why" role="group" aria-label="Why not?">
+      ${WHY.map((c,i)=>`<button class="choice ${c.cls}${kb?" kb":""}" data-s="${c.s}" data-i="${i}"><span>${c.label}</span></button>`).join("")}
+    </div>
+    <div class="below"><button class="undo" id="skipWhy">Skip this one</button>${last?`<button class="undo" id="undo" style="margin-left:10px">Undo</button>`:""}</div>`;
   if(kb) el.querySelectorAll(".choice")[sel]?.focus();
 }
 const HEADPHONES='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 0 0-9 9v7a2 2 0 0 0 2 2h2v-8H5v-1a7 7 0 0 1 14 0v1h-2v8h2a2 2 0 0 0 2-2v-7a9 9 0 0 0-9-9z"/></svg>';
@@ -238,7 +287,7 @@ function otherSources(b){
 }
 function undoHtml(){
   if(!last) return `<div class="below"></div>`;
-  const b=D.shelf.find(x=>x.id===last.id);
+  const b=findBook(last.id);
   return `<div class="below"><button class="undo" id="undo">Undo “${esc(b ? (b.title.length>28 ? b.title.slice(0,26)+"…" : b.title) : "last")}”</button></div>`;
 }
 
@@ -277,12 +326,12 @@ function renderSaved(){
     </div>`;
 }
 function render(){
-  $("#tabBooks").setAttribute("aria-pressed", String(view==="books"));
+  $("#tabBooks").setAttribute("aria-pressed", String(view==="books"||view==="why"));
   $("#tabSaved").setAttribute("aria-pressed", String(view==="saved"));
   $("#tabSaved").textContent = `Saved (${savedBooks().length})`;
-  $("#viewBooks").hidden = view!=="books";
+  $("#viewBooks").hidden = view==="saved";
   $("#viewSaved").hidden = view!=="saved";
-  view==="books" ? renderBooks() : renderSaved();
+  view==="books" ? renderBooks() : view==="why" ? renderWhy() : renderSaved();
 }
 
 /* ---------- actions ---------- */
@@ -304,8 +353,8 @@ function undo(){
 // The message to Erin: readable lines for her, plus a code the desktop app imports.
 function buildMessage(all){
   const picked=Object.entries(answers).filter(([,a])=>all || a.at>sentAt);
-  const byS={good:[],forgot:[],pass:[],save:[]};
-  const books=Object.fromEntries(D.shelf.map(b=>[b.id,b]));
+  const byS={good:[],forgot:[],pass:[],save:[],nobattle:[],tone:[],seen:[],bad:[]};
+  const books=Object.fromEntries([...D.history, ...D.shelf].map(b=>[b.id,b]));
   for(const [id,a] of picked){ const b=books[id]; if(b && byS[a.s]) byS[a.s].push(`${b.title} (${lastName(b.author)})`); }
   const code=picked.map(([id,a])=>{ const b=books[id]; const rec=[id,a.s,a.at];
     if(b?.isNew) rec.push({title:b.title,author:b.author,year:b.year,th:b.th,br:b.br,form:b.form,tags:b.tags,feel:b.feel,about:b.about});
@@ -315,6 +364,10 @@ function buildMessage(all){
   if(byS.save.length) lines.push("Saved: "+byS.save.join("; "));
   if(byS.forgot.length) lines.push("Read, doesn't remember: "+byS.forgot.join("; "));
   if(byS.pass.length) lines.push("Pass: "+byS.pass.join("; "));
+  if(byS.nobattle.length) lines.push("Not interested in that battle: "+byS.nobattle.join("; "));
+  if(byS.tone.length) lines.push("Too sentimental or brutal: "+byS.tone.join("; "));
+  if(byS.seen.length) lines.push("Already read it or saw the movie: "+byS.seen.join("; "));
+  if(byS.bad.length) lines.push("Read it, it's bad: "+byS.bad.join("; "));
   lines.push("", "OOB1:"+btoa(unescape(encodeURIComponent(JSON.stringify(code)))));
   return {text:lines.join("\n"), count:picked.length};
 }
@@ -342,16 +395,21 @@ document.addEventListener("click", e=>{
   if(t.id==="tabBooks"){ view="books"; render(); return; }
   if(t.id==="tabSaved"){ view="saved"; render(); window.scrollTo(0,0); return; }
   if(t.id==="undo"){ undo(); return; }
+  if(t.id==="whyBtn"){ view="why"; sel=0; render(); window.scrollTo(0,0); return; }
+  if(t.id==="backBooks"){ view="books"; render(); window.scrollTo(0,0); return; }
+  if(t.id==="skipWhy"){ const c=$(".book"); if(c) skipWhy.add(c.dataset.id); render(); return; }
   if(t.id==="sendBtn"){ send(); return; }
   if(t.dataset.s){ if(t.dataset.i) sel=+t.dataset.i; answer(t.dataset.s); }
 });
 document.addEventListener("keydown", e=>{
-  if(view!=="books" || e.metaKey||e.ctrlKey||e.altKey) return;
-  const c=CHOICES.find(c=>c.key===e.key);
-  if(c){ e.preventDefault(); kb=true; sel=CHOICES.indexOf(c); answer(c.s); return; }
+  if(view==="saved" || e.metaKey||e.ctrlKey||e.altKey) return;
+  const SET = view==="why" ? WHY : CHOICES;
+  const c=SET.find(c=>c.key===e.key);
+  if(c){ e.preventDefault(); kb=true; sel=SET.indexOf(c); answer(c.s); return; }
+  if(view==="why" && (e.key==="s"||e.key==="S")){ e.preventDefault(); $("#skipWhy")?.click(); return; }
   if(e.key==="Backspace" || e.key==="u"){ e.preventDefault(); undo(); return; }
   const btns=[...document.querySelectorAll(".choice")]; if(!btns.length) return;
-  if(document.activeElement?.id==="undo"){
+  if(document.activeElement?.id==="undo" || document.activeElement?.id==="skipWhy"){
     if(e.key==="ArrowUp"){ e.preventDefault(); btns[Math.max(2,sel)].focus(); }
     else if(e.key==="ArrowDown") e.preventDefault();
     return;
@@ -361,7 +419,7 @@ document.addEventListener("keydown", e=>{
   if(move!==undefined){
     e.preventDefault(); kb=true;
     if(cur<0){ sel=Math.min(sel,3); }
-    else if(e.key==="ArrowDown" && cur>=2){ $("#undo")?.focus(); return; }
+    else if(e.key==="ArrowDown" && cur>=2){ ($("#skipWhy")||$("#undo"))?.focus(); return; }
     else { const n=cur+move; if(n>=0 && n<4) sel=n; }
     btns.forEach(b=>b.classList.add("kb")); btns[sel].focus();
   }
