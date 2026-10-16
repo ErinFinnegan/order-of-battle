@@ -21,8 +21,11 @@ const E = new Function("RAT", "EXT", "ABT", engine + `
 
 const cur = JSON.parse(fs.readFileSync(path.join(root, "phone/curation.json"), "utf8"));
 const drop = new Set(cur.drop);
+// Audiobook status from curation.json: audio = "yes" (with an Audible link) or "no".
+const audioOf = id => { const a = cur.audio && cur.audio[id];
+  return a ? { audio: "yes", audible: a.url || undefined, audioNote: a.note || undefined } : { audio: "no" }; };
 const slim = b => ({ id: b.id, title: b.title, author: b.author, year: b.year || null, th: b.th, br: b.br, form: b.form,
-  tags: b.tags || [], feel: b.feel || E.feelOf(b) || undefined });
+  tags: b.tags || [], feel: b.feel || E.feelOf(b) || undefined, ...audioOf(b.id) });
 
 // Everything he has answered: the phone app learns from it but never shows these books.
 const history = E.books.filter(b => E.status(b.id)).map(b => {

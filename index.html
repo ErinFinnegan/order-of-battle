@@ -665,12 +665,12 @@ function bookMeta(b){
 function whereLinks(b){
   const q=encodeURIComponent(b.title+" "+lastName(b.author));
   const qt=encodeURIComponent(b.title);
-  return `<a href="https://www.overdrive.com/search?q=${q}" target="_blank" rel="noopener">Libby</a>
-    <a href="https://www.hoopladigital.com/search?q=${qt}&type=direct" target="_blank" rel="noopener">Hoopla</a>
-    <a href="https://libro.fm/search?q=${q}" target="_blank" rel="noopener">Libro.fm</a>
+  return `<a href="https://www.audible.com/search?keywords=${q}" target="_blank" rel="noopener"><b>Audible</b></a>
     <a href="https://www.chirpbooks.com/search?query=${q}" target="_blank" rel="noopener">Chirp</a>
-    <a href="https://openlibrary.org/search?q=${q}" target="_blank" rel="noopener">Open Library</a>
-    <a href="https://nlsbard.loc.gov/" target="_blank" rel="noopener">BARD</a>`;
+    <a href="https://libro.fm/search?q=${q}" target="_blank" rel="noopener">Libro.fm</a>
+    <a href="https://nlsbard.loc.gov/" target="_blank" rel="noopener">BARD</a>
+    <a href="https://www.overdrive.com/search?q=${q}" target="_blank" rel="noopener">Libby</a>
+    <a href="https://www.hoopladigital.com/search?q=${qt}&type=direct" target="_blank" rel="noopener">Hoopla</a>`;
 }
 function whyLine(p, max=3){
   const pos=p.contrib.filter(c=>c.v>0.02).slice(0,max).map(c=>`<span class="pos">+ ${esc(featLabel(c.f))}</span>`);
@@ -909,11 +909,14 @@ function renderFind(){
 function renderListen(){
   const el=$("#pane-listen");
   const S=[
-    {top:true, n:"NLS Talking Books (BARD)", c:"Free · Library of Congress", url:"https://www.loc.gov/nls/",
+    {top:true, n:"Audible", c:"He already has it", url:"https://www.audible.com/",
+     p:"The surest place to actually get a book. Check his membership for unused credits, and look at the Audible Plus catalog, which is included and has some older military history.",
+     how:"Search by title and author. Many books in this app link straight to their Audible page."},
+    {n:"NLS Talking Books (BARD)", c:"Free · Library of Congress", url:"https://www.loc.gov/nls/",
      p:"If his eyesight makes regular print hard to read, he very likely qualifies. It's free: a mailed player or the BARD Mobile app, and postage-free cartridges. The catalog goes back decades, with lots of WWII memoirs and histories that never got a commercial audiobook. That makes it the best place to find the older books.",
      how:"Apply through your state's talking-book library. A doctor, eye specialist, or librarian signs the form."},
     {n:"Libby", c:"Free with a library card", url:"https://libbyapp.com/",
-     p:"Borrow audiobooks from his public library. Add more than one library card for a bigger catalog; some big-city libraries sell non-resident cards for an annual fee.",
+     p:"Borrows audiobooks from a public library, but it only works once a library card is set up in the app, and a book listed there may not be available at his library. It has been frustrating for him, so treat it as a last resort.",
      how:"Popular titles have wait lists; place holds early."},
     {n:"Hoopla", c:"Free with a participating library", url:"https://www.hoopladigital.com/",
      p:"Instant borrowing with no wait lists, good for backlist military history. Each library sets a monthly borrow limit.", how:"Check whether his library takes part."},
@@ -928,7 +931,7 @@ function renderListen(){
     {n:"Read-aloud apps", c:"For books with no audiobook at all", url:"https://openlibrary.org/",
      p:"For an old title with no audio and no BARD recording, an ebook plus a read-aloud app (Kindle Assistive Reader, Apple Books Speak Screen, Voice Dream and others) will read it to him.", how:"Open Library also lends scans of many out-of-print books."},
   ];
-  el.innerHTML = `<p style="margin:0 0 16px">He's used up Audible. These are the other places to get the same books, with the free ones first. Each recommendation in <b>Up next</b> has a search link for every one of them.</p>
+  el.innerHTML = `<p style="margin:0 0 16px">Where to get the books, with the most reliable first. Each recommendation in <b>Up next</b> has a search link for every one of them.</p>
     <div class="sources">${S.map(s=>`<div class="src ${s.top?"top":""}">
       ${s.top?'<div class="lbl" style="color:var(--olive)">Start here</div>':""}
       <h3>${esc(s.n)}</h3><div class="cost">${esc(s.c)}</div><p>${esc(s.p)}</p><p class="muted" style="font-size:15px">${esc(s.how)}</p>

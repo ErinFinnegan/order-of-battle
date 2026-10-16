@@ -43,6 +43,10 @@ header h1{font-family:var(--display); font-size:26px; margin:0; letter-spacing:.
 .book h2 mark{background:var(--hl); color:var(--hl-ink); padding:0 .18em; -webkit-box-decoration-break:clone; box-decoration-break:clone; border-radius:4px}
 .book .by{font-size:23px; margin-top:10px}
 .book .about{font-size:20px; margin-top:14px; color:var(--ink)}
+.audio{display:inline-flex; align-items:center; gap:8px; margin-top:12px; font-size:18px; font-weight:700; border-radius:20px; padding:5px 14px 5px 10px}
+.audio svg{width:22px; height:22px}
+.audio.yes{background:var(--olive); color:var(--olive-ink)}
+.audio.no{border:2px dashed var(--line); color:var(--muted); font-weight:400; padding:4px 14px}
 
 .choices{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:22px; position:sticky; bottom:calc(10px + env(safe-area-inset-bottom,0px)); background:var(--paper); padding-top:8px}
 .choice{min-height:104px; border-radius:14px; border:3px solid var(--line); background:var(--card); cursor:pointer;
@@ -68,6 +72,7 @@ header h1{font-family:var(--display); font-size:26px; margin:0; letter-spacing:.
 .links{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
 .links a{display:inline-flex; align-items:center; min-height:50px; padding:10px 16px; border-radius:8px; background:var(--olive); color:var(--olive-ink); text-decoration:none; font-weight:700; font-size:19px}
 .links a.alt{background:transparent; color:var(--ink); border:2px solid var(--ink)}
+.links a.lib{background:transparent; color:var(--muted); min-height:50px; padding:10px 6px; text-decoration:underline; font-weight:400; font-size:17px}
 .send{margin-top:28px; padding:18px; border:2px dashed var(--line); border-radius:10px}
 .send button{width:100%; min-height:64px; border-radius:10px; border:none; background:var(--olive); color:var(--olive-ink); font-size:21px; font-weight:700; cursor:pointer}
 .send textarea{width:100%; margin-top:12px; font-size:14px; padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--ink)}
@@ -169,12 +174,15 @@ function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; cle
 
 function queue(){
   const aff=affinity(answers);
-  return D.shelf.filter(b=>!answers[b.id]).map(b=>({b,sc:score(b,aff)})).sort((x,y)=>y.sc-x.sc).map(x=>x.b);
+  // Books with a confirmed audiobook always come first; within each group, best match first.
+  return D.shelf.filter(b=>!answers[b.id]).map(b=>({b,sc:score(b,aff)}))
+    .sort((x,y)=>(y.b.audio==="yes")-(x.b.audio==="yes") || y.sc-x.sc).map(x=>x.b);
 }
 function savedBooks(){
   const fromPhone=D.shelf.filter(b=>answers[b.id]?.s==="save").sort((a,b)=>answers[b.id].at-answers[a.id].at);
   const earlier=D.history.filter(b=>b.s==="unread");
-  return [...fromPhone, ...earlier];
+  const all=[...fromPhone, ...earlier];
+  return [...all.filter(b=>b.audio==="yes"), ...all.filter(b=>b.audio!=="yes")];
 }
 
 /* ---------- views ---------- */
@@ -190,6 +198,7 @@ function renderBooks(){
     <article class="book" data-id="${esc(b.id)}">
       <h2><mark>${esc(b.title)}</mark></h2>
       <div class="by">${esc(b.author)}${b.year?` · ${b.year}`:""}</div>
+      ${audioLine(b)}
       ${b.about?`<p class="about">${esc(b.about)}</p>`:""}
     </article>
     <div class="choices" role="group" aria-label="Your answer">
@@ -198,6 +207,13 @@ function renderBooks(){
     ${undoHtml()}`;
   if(kb) el.querySelectorAll(".choice")[sel]?.focus();
 }
+const HEADPHONES='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 0 0-9 9v7a2 2 0 0 0 2 2h2v-8H5v-1a7 7 0 0 1 14 0v1h-2v8h2a2 2 0 0 0 2-2v-7a9 9 0 0 0-9-9z"/></svg>';
+function audioLine(b){
+  return b.audio==="yes"
+    ? `<div class="audio yes">${HEADPHONES}<span>Audiobook on Audible${b.audioNote?` · ${esc(b.audioNote)}`:""}</span></div>`
+    : `<div class="audio no">No audiobook found</div>`;
+}
+const audibleUrl = b => b.audible || `https://www.audible.com/search?keywords=${q(b.title+" "+lastName(b.author))}`;
 function undoHtml(){
   if(!last) return `<div class="below"></div>`;
   const b=D.shelf.find(x=>x.id===last.id);
@@ -209,15 +225,18 @@ function renderSaved(){
   const pending=Object.values(answers).filter(a=>a.at>sentAt).length;
   $("#viewSaved").innerHTML=`
     <h2>Saved to hear</h2>
-    <p class="hint">Libby and Hoopla are free with a library card. BARD is the free Talking Books service.</p>
+    <p class="hint">Books with an Audible audiobook are listed first. BARD is the free Talking Books service for people with low vision.</p>
     ${list.length?`<ol>${list.map(b=>`<li>
       <div class="t"><mark>${esc(b.title)}</mark></div>
       <div class="a">${esc(b.author)}</div>
+      ${audioLine(b)}
       ${b.about?`<div class="d">${esc(b.about)}</div>`:""}
-      <div class="links">
-        <a href="https://www.overdrive.com/search?q=${q(b.title+" "+lastName(b.author))}" target="_blank" rel="noopener">Libby</a>
-        <a href="https://www.hoopladigital.com/search?q=${q(b.title)}&amp;type=direct" target="_blank" rel="noopener">Hoopla</a>
-        <a class="alt" href="https://nlsbard.loc.gov/" target="_blank" rel="noopener">BARD</a>
+      <div class="links">${b.audio==="yes"
+        ? `<a href="${esc(audibleUrl(b))}" target="_blank" rel="noopener">Get it on Audible</a>
+           <a class="alt" href="https://nlsbard.loc.gov/" target="_blank" rel="noopener">BARD</a>`
+        : `<a href="https://nlsbard.loc.gov/" target="_blank" rel="noopener">Try BARD</a>
+           <a class="alt" href="${esc(audibleUrl(b))}" target="_blank" rel="noopener">Search Audible</a>`}
+        <a class="lib" href="https://www.overdrive.com/search?q=${q(b.title+" "+lastName(b.author))}" target="_blank" rel="noopener">Library (Libby)</a>
       </div></li>`).join("")}</ol>`:`<p class="hint" style="margin-top:16px">Nothing saved yet. Tap “Save / Haven't Heard” on a book to keep it here.</p>`}
     <div class="send">
       <p style="margin:0 0 12px"><b>${pending ? `${pending} new answer${pending===1?"":"s"}` : "No new answers"}</b> since you last sent them to Erin.</p>

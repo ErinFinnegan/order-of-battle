@@ -18,7 +18,10 @@ artifact has both.
 A simpler version for Dad's Android phone: one book at a time with a large description,
 and four big buttons: **Good Book**, **Read, Don't Remember**, **Pass**, and **Save /
 Haven't Heard**. No tags or scores on screen. A **Saved** tab lists what he wants to hear,
-with Libby, Hoopla and BARD buttons.
+led by confirmed audiobooks with a **Get it on Audible** button, then BARD; library
+apps (Libby) come last, since they depend on a working library card. Books with a
+confirmed Audible edition always rank ahead of books without one, and each card says
+which it is. Audiobook status lives in `phone/curation.json` under `audio`.
 
 - **Install:** open https://erinfinnegan.github.io/order-of-battle/phone/ in Chrome on the
   phone, then menu (⋮) → **Add to Home screen** / **Install app**. It opens full-screen

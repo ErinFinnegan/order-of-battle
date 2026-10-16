@@ -1,6 +1,106 @@
 {
   "_comment": "Hand curation for the phone shelf. 'drop' removes unsorted books that his answers say won't land; 'about' fills in descriptions; 'add' are new books picked for his strongest pulls. Regenerate data.js with tools/build-phone-data.js.",
-  "drop": ["Patton's Prayer","Ardennes 1944","Bastogne: The First Eight Days","MacArthur at War","The Admirals","Bull Halsey","Coral and Brass","Our Jungle Road to Tokyo","The Stilwell Papers","Eisenhower's Lieutenants","Brothers, Rivals, Victors","Lucky Forward","Patton's Ghost Corps","Patton's War","The Island","Into the Valley","Challenge for the Pacific","Midnight in the Pacific","Men Against Fire","Masters and Commanders","Eagle Against the Sun","The Two-Ocean War","Tower of Skulls","Retribution","Armageddon","Six Armies in Normandy","Decision in Normandy","Tennozan","The Greatest Generation","Into the Rising Sun","Beyond Valor","Tears in the Darkness","Some Survived","Lost in Shangri-La","Hitler's U-Boat War","The Boys' Crusade","Leyte: The Return to the Philippines","Spitfire: Portrait of a Legend","Hurricane: Victor of the Battle of Britain","The Narrow Margin","Reach for the Sky","The Battle of Britain: Five Months That Changed History","The Last Enemy","Fighter Boys","Brothers in Arms","Operation Pedestal","The Men of Company K","Four Stars of Valor","Doing Battle","If You Survive","Those Devils in Baggy Pants","Roll Me Over","Rendezvous with Destiny","Ridgway's Paratroopers","The Road to Arnhem","Currahee!","On to Berlin","Biggest Brother","Seven Roads to Hell","Shifty's War","A Company of Heroes","Call of Duty","Tonight We Die as Men","Another River, Another Town","The Clay Pigeons of St. Lo","The Marauders","The Burma Road","Flying Tigers","God Is My Co-Pilot","Bloody Buna","Fortress Rabaul","Silent Victory","Kasserine Pass","When the Odds Were Even","Follow Me and Die","Armored Thunderbolt","Brothers in Arms: The Epic Story of the 761st Tank Battalion","Overlord","Normandy '44","Rampage","Operation Drumbeat","The Bomber Mafia","Take Her Deep!","Islands of the Damned","The Bloody Battle for Suribachi","Baa Baa Black Sheep","Thirty Seconds Over Tokyo","Strong Men Armed","Okinawa: The Last Battle of World War II","But Not in Shame","Island Victory","Miracle at Midway","At Dawn We Slept","Day of Infamy","Lonely Vigil","Indianapolis","Bloody Okinawa","The Devil's Anvil"],
+  "drop": [
+    "Patton's Prayer",
+    "Ardennes 1944",
+    "Bastogne: The First Eight Days",
+    "MacArthur at War",
+    "The Admirals",
+    "Bull Halsey",
+    "Coral and Brass",
+    "Our Jungle Road to Tokyo",
+    "The Stilwell Papers",
+    "Eisenhower's Lieutenants",
+    "Brothers, Rivals, Victors",
+    "Lucky Forward",
+    "Patton's Ghost Corps",
+    "Patton's War",
+    "The Island",
+    "Into the Valley",
+    "Challenge for the Pacific",
+    "Midnight in the Pacific",
+    "Men Against Fire",
+    "Masters and Commanders",
+    "Eagle Against the Sun",
+    "The Two-Ocean War",
+    "Tower of Skulls",
+    "Retribution",
+    "Armageddon",
+    "Six Armies in Normandy",
+    "Decision in Normandy",
+    "Tennozan",
+    "The Greatest Generation",
+    "Into the Rising Sun",
+    "Beyond Valor",
+    "Tears in the Darkness",
+    "Some Survived",
+    "Lost in Shangri-La",
+    "Hitler's U-Boat War",
+    "The Boys' Crusade",
+    "Leyte: The Return to the Philippines",
+    "Spitfire: Portrait of a Legend",
+    "Hurricane: Victor of the Battle of Britain",
+    "The Narrow Margin",
+    "Reach for the Sky",
+    "The Battle of Britain: Five Months That Changed History",
+    "The Last Enemy",
+    "Fighter Boys",
+    "Brothers in Arms",
+    "Operation Pedestal",
+    "The Men of Company K",
+    "Four Stars of Valor",
+    "Doing Battle",
+    "If You Survive",
+    "Those Devils in Baggy Pants",
+    "Roll Me Over",
+    "Rendezvous with Destiny",
+    "Ridgway's Paratroopers",
+    "The Road to Arnhem",
+    "Currahee!",
+    "On to Berlin",
+    "Biggest Brother",
+    "Seven Roads to Hell",
+    "Shifty's War",
+    "A Company of Heroes",
+    "Call of Duty",
+    "Tonight We Die as Men",
+    "Another River, Another Town",
+    "The Clay Pigeons of St. Lo",
+    "The Marauders",
+    "The Burma Road",
+    "Flying Tigers",
+    "God Is My Co-Pilot",
+    "Bloody Buna",
+    "Fortress Rabaul",
+    "Silent Victory",
+    "Kasserine Pass",
+    "When the Odds Were Even",
+    "Follow Me and Die",
+    "Armored Thunderbolt",
+    "Brothers in Arms: The Epic Story of the 761st Tank Battalion",
+    "Overlord",
+    "Normandy '44",
+    "Rampage",
+    "Operation Drumbeat",
+    "The Bomber Mafia",
+    "Take Her Deep!",
+    "Islands of the Damned",
+    "The Bloody Battle for Suribachi",
+    "Baa Baa Black Sheep",
+    "Thirty Seconds Over Tokyo",
+    "Strong Men Armed",
+    "Okinawa: The Last Battle of World War II",
+    "But Not in Shame",
+    "Island Victory",
+    "Miracle at Midway",
+    "At Dawn We Slept",
+    "Day of Infamy",
+    "Lonely Vigil",
+    "Indianapolis",
+    "Bloody Okinawa",
+    "The Devil's Anvil",
+    "D-Day: The Soldiers' Story"
+  ],
   "about": {
     "bitter-victory-d-este": "The Allied invasion of Sicily in July and August 1943, including Patton's race to Messina and his rivalry with Montgomery.",
     "clash-of-the-carriers-tillman": "The Battle of the Philippine Sea in June 1944, the 'Great Marianas Turkey Shoot,' told largely through the American carrier pilots and aircrews.",
@@ -9,7 +109,7 @@
     "boys-of-pointe-du-hoc-brinkley": "The 2nd Ranger Battalion's climb up the cliffs of Pointe du Hoc on D-Day, and Ronald Reagan's 1984 speech honoring the men who made it.",
     "battle-for-leyte-gulf-woodward": "One of the first full accounts of the Battle of Leyte Gulf, written in 1947 by a historian who had served in the Navy during the war.",
     "leyte-morison": "Volume 12 of Samuel Eliot Morison's history of the U.S. Navy in WWII: the Leyte landings of October 1944 and the great naval battle that followed.",
-    "lightning-down-clavin": "P-38 pilot Jim Brown, shot down over France in 1944, and his long fight to survive and escape as a prisoner of the Germans.",
+    "lightning-down-clavin": "P-38 pilot Joe Moser, shot down over France in 1944 and sent with other captured Allied airmen to the Buchenwald concentration camp.",
     "hell-hawks-dorr": "The P-47 Thunderbolt pilots of the 365th Fighter Group, flying low-level attack missions in support of the troops from Normandy into Germany.",
     "combat-crew-comer": "A B-17 flight engineer and gunner's day-by-day account of his 25 missions with the 381st Bomb Group over Europe in 1943.",
     "tarawa-the-story-of-a-battle-sherrod": "A Time magazine correspondent's eyewitness account of the Marines' landing at Tarawa in November 1943, written within weeks of the battle.",
@@ -39,33 +139,345 @@
     "first-light-wellum": "A teenage RAF Spitfire pilot's memoir of flying in the Battle of Britain."
   },
   "add": [
-    {"title":"For Crew and Country","author":"John Wukovits","year":2013,"th":"P","br":"navy","form":"history","tags":["destroyers","samar","leyte-gulf","medal-of-honor"],"feel":"close",
-     "about":"The destroyer escort USS Samuel B. Roberts and her crew, from her commissioning to her charge against Japanese battleships off Samar in October 1944."},
-    {"title":"Tin Can Titans","author":"John Wukovits","year":2017,"th":"P","br":"navy","form":"history","tags":["destroyers","solomons"],"feel":"close",
-     "about":"The ships and crews of the most decorated U.S. Navy destroyer squadron of WWII, from the Solomon Islands battles to the end of the Pacific war."},
-    {"title":"Dogfight over Tokyo","author":"John Wukovits","year":2019,"th":"P","br":"navy","form":"history","tags":["pilot","carriers","tokyo"],"feel":"close",
-     "about":"The carrier pilots of Fighting Squadron 88 and their air battle over Tokyo on August 15, 1945, the morning Japan surrendered."},
-    {"title":"American Commando","author":"John Wukovits","year":2009,"th":"P","br":"usmc","form":"bio","tags":["raiders","makin"],"feel":"close",
-     "about":"Evans Carlson and his Marine Raiders, from the raid on Makin Island to their long patrol behind Japanese lines."},
-    {"title":"Destroyer Squadron 23","author":"Ken Jones","year":1959,"th":"P","br":"navy","form":"history","tags":["destroyers","solomons"],"feel":"close",
-     "about":"Arleigh Burke's 'Little Beavers' destroyer squadron in the Solomon Islands in 1943, including the Battle of Cape St. George."},
-    {"title":"Battleship at War","author":"Ivan Musicant","year":1986,"th":"P","br":"navy","form":"history","tags":["battleship","surface-battle"],"feel":"close",
-     "about":"The battleship USS Washington, from Atlantic convoy duty to her night duel that sank the Japanese battleship Kirishima in November 1942, and on through the Pacific war."},
-    {"title":"D-Day in the Pacific: The Battle of Saipan","author":"Harold J. Goldberg","year":2007,"th":"P","br":"multi","form":"history","tags":["saipan","marianas"],"feel":"close",
-     "about":"The June–July 1944 invasion of Saipan by Marines and Army troops, told through the men who fought it."},
-    {"title":"The Hero of Hacksaw Ridge","author":"Booton Herndon","year":1967,"th":"P","br":"army","form":"bio","tags":["okinawa","medal-of-honor","medic"],"feel":"close",
-     "about":"Desmond Doss, the unarmed Army medic who saved dozens of wounded men on the Maeda Escarpment at Okinawa and received the Medal of Honor. First published as The Unlikeliest Hero."},
-    {"title":"Darby's Rangers: We Led the Way","author":"William O. Darby & William H. Baumer","year":1980,"th":"M","br":"ranger","form":"memoir","tags":["sicily","anzio","rangers"],"feel":"close",
-     "about":"The Ranger battalions' war in North Africa, Sicily and Italy, told by their founder, William Darby, who was killed in action in 1945."},
-    {"title":"The Devil's Brigade","author":"Robert H. Adleman & George Walton","year":1966,"th":"M","br":"ranger","form":"history","tags":["anzio","italy","special-forces"],"feel":"close",
-     "about":"The First Special Service Force, the joint American-Canadian commando unit, from training in Montana through Monte la Difensa and Anzio. The basis for the 1968 film."},
-    {"title":"Anzio: Italy and the Battle for Rome","author":"Lloyd Clark","year":2006,"th":"M","br":"multi","form":"history","tags":["anzio","italy"],"feel":"close",
-     "about":"The Anzio landing of January 1944 and the costly fight for the beachhead, told from soldiers' accounts on both sides."},
-    {"title":"Big Week","author":"James Holland","year":2018,"th":"A","br":"aaf","form":"history","tags":["bomber","eighth-air-force","fighter"],"feel":"close",
-     "about":"The week in February 1944 when American bombers and fighters set out to break the Luftwaffe over Germany, told through the crews on both sides."},
-    {"title":"The Americans at D-Day","author":"John C. McManus","year":2004,"th":"E","br":"army","form":"history","tags":["d-day","omaha-beach","utah-beach"],"feel":"close",
-     "about":"The American soldiers, sailors and airmen of June 6, 1944, from the airborne drops behind the beaches to the landings at Utah and Omaha."},
-    {"title":"Beyond the Beachhead","author":"Joseph Balkoski","year":1989,"th":"E","br":"army","form":"unit","tags":["29th-division","normandy","d-day"],"feel":"close",
-     "about":"The 29th Infantry Division in Normandy, from Omaha Beach through the hedgerow battles to the capture of St. Lô."}
-  ]
+    {
+      "title": "For Crew and Country",
+      "author": "John Wukovits",
+      "year": 2013,
+      "th": "P",
+      "br": "navy",
+      "form": "history",
+      "tags": [
+        "destroyers",
+        "samar",
+        "leyte-gulf",
+        "medal-of-honor"
+      ],
+      "feel": "close",
+      "about": "The destroyer escort USS Samuel B. Roberts and her crew, from her commissioning to her charge against Japanese battleships off Samar in October 1944."
+    },
+    {
+      "title": "Tin Can Titans",
+      "author": "John Wukovits",
+      "year": 2017,
+      "th": "P",
+      "br": "navy",
+      "form": "history",
+      "tags": [
+        "destroyers",
+        "solomons"
+      ],
+      "feel": "close",
+      "about": "Destroyer Squadron 21, from the Solomon Islands battles to leading Halsey's ships into Tokyo Bay for the Japanese surrender."
+    },
+    {
+      "title": "Dogfight over Tokyo",
+      "author": "John Wukovits",
+      "year": 2019,
+      "th": "P",
+      "br": "navy",
+      "form": "history",
+      "tags": [
+        "pilot",
+        "carriers",
+        "tokyo"
+      ],
+      "feel": "close",
+      "about": "The carrier pilots of Fighting Squadron 88 and their air battle over Tokyo on August 15, 1945, the morning Japan surrendered."
+    },
+    {
+      "title": "American Commando",
+      "author": "John Wukovits",
+      "year": 2009,
+      "th": "P",
+      "br": "usmc",
+      "form": "bio",
+      "tags": [
+        "raiders",
+        "makin"
+      ],
+      "feel": "close",
+      "about": "Evans Carlson and his Marine Raiders, from the raid on Makin Island to their long patrol behind Japanese lines."
+    },
+    {
+      "title": "Destroyer Squadron 23",
+      "author": "Ken Jones",
+      "year": 1959,
+      "th": "P",
+      "br": "navy",
+      "form": "history",
+      "tags": [
+        "destroyers",
+        "solomons"
+      ],
+      "feel": "close",
+      "about": "Arleigh Burke's 'Little Beavers' destroyer squadron in the Solomon Islands in 1943, including the Battle of Cape St. George."
+    },
+    {
+      "title": "Battleship at War",
+      "author": "Ivan Musicant",
+      "year": 1986,
+      "th": "P",
+      "br": "navy",
+      "form": "history",
+      "tags": [
+        "battleship",
+        "surface-battle"
+      ],
+      "feel": "close",
+      "about": "The battleship USS Washington, from Atlantic convoy duty to her night duel that sank the Japanese battleship Kirishima in November 1942, and on through the Pacific war."
+    },
+    {
+      "title": "D-Day in the Pacific: The Battle of Saipan",
+      "author": "Harold J. Goldberg",
+      "year": 2007,
+      "th": "P",
+      "br": "multi",
+      "form": "history",
+      "tags": [
+        "saipan",
+        "marianas"
+      ],
+      "feel": "close",
+      "about": "The June–July 1944 invasion of Saipan by Marines and Army troops, told through the men who fought it."
+    },
+    {
+      "title": "The Hero of Hacksaw Ridge",
+      "author": "Booton Herndon",
+      "year": 1967,
+      "th": "P",
+      "br": "army",
+      "form": "bio",
+      "tags": [
+        "okinawa",
+        "medal-of-honor",
+        "medic"
+      ],
+      "feel": "close",
+      "about": "Desmond Doss, the unarmed Army medic who saved dozens of wounded men on the Maeda Escarpment at Okinawa and received the Medal of Honor. First published as The Unlikeliest Hero."
+    },
+    {
+      "title": "Darby's Rangers: We Led the Way",
+      "author": "William O. Darby & William H. Baumer",
+      "year": 1980,
+      "th": "M",
+      "br": "ranger",
+      "form": "memoir",
+      "tags": [
+        "sicily",
+        "anzio",
+        "rangers"
+      ],
+      "feel": "close",
+      "about": "The Ranger battalions' war in North Africa, Sicily and Italy, told by their founder, William Darby, who was killed in action in 1945."
+    },
+    {
+      "title": "The Devil's Brigade",
+      "author": "Robert H. Adleman & George Walton",
+      "year": 1966,
+      "th": "M",
+      "br": "ranger",
+      "form": "history",
+      "tags": [
+        "anzio",
+        "italy",
+        "special-forces"
+      ],
+      "feel": "close",
+      "about": "The First Special Service Force, the joint American-Canadian commando unit, from training in Montana through Monte la Difensa and Anzio. The basis for the 1968 film."
+    },
+    {
+      "title": "Anzio: Italy and the Battle for Rome",
+      "author": "Lloyd Clark",
+      "year": 2006,
+      "th": "M",
+      "br": "multi",
+      "form": "history",
+      "tags": [
+        "anzio",
+        "italy"
+      ],
+      "feel": "close",
+      "about": "The Anzio landing of January 1944 and the costly fight for the beachhead, told from soldiers' accounts on both sides."
+    },
+    {
+      "title": "Big Week",
+      "author": "James Holland",
+      "year": 2018,
+      "th": "A",
+      "br": "aaf",
+      "form": "history",
+      "tags": [
+        "bomber",
+        "eighth-air-force",
+        "fighter"
+      ],
+      "feel": "close",
+      "about": "The week in February 1944 when American bombers and fighters set out to break the Luftwaffe over Germany, told through the crews on both sides."
+    },
+    {
+      "title": "The Americans at D-Day",
+      "author": "John C. McManus",
+      "year": 2004,
+      "th": "E",
+      "br": "army",
+      "form": "history",
+      "tags": [
+        "d-day",
+        "omaha-beach",
+        "utah-beach"
+      ],
+      "feel": "close",
+      "about": "The American soldiers, sailors and airmen of June 6, 1944, from the airborne drops behind the beaches to the landings at Utah and Omaha."
+    },
+    {
+      "title": "Beyond the Beachhead",
+      "author": "Joseph Balkoski",
+      "year": 1989,
+      "th": "E",
+      "br": "army",
+      "form": "unit",
+      "tags": [
+        "29th-division",
+        "normandy",
+        "d-day"
+      ],
+      "feel": "close",
+      "about": "The 29th Infantry Division in Normandy, from Omaha Beach through the hedgerow battles to the capture of St. Lô."
+    }
+  ],
+  "audio": {
+    "_comment": "Audible editions confirmed by search on 2026-10-16. A URL is the product page; null means confirmed but use a search link. Books not listed have no audiobook found.",
+    "thunder-below-fluckey": {
+      "url": "https://www.audible.com/pd/Thunder-Below-Audiobook/B00EAXOZMM"
+    },
+    "clear-the-bridge-o-kane": {
+      "url": "https://www.audible.com/pd/Clear-the-Bridge-Audiobook/1705257461"
+    },
+    "wahoo-o-kane": {
+      "url": "https://www.audible.com/pd/Wahoo-Audiobook/1977300103"
+    },
+    "thunderbolt-johnson": {
+      "url": "https://www.audible.com/pd/Thunderbolt-Audiobook/B09DHQ98DH"
+    },
+    "yeager-yeager": {
+      "url": "https://www.audible.com/pd/Yeager-Audiobook/0593213564"
+    },
+    "combat-crew-comer": {
+      "url": "https://www.audible.com/pd/Combat-Crew-Audiobook/B00WL4HLZA"
+    },
+    "lightning-down-clavin": {
+      "url": "https://www.audible.com/pd/Lightning-Down-Audiobook/1250818109"
+    },
+    "clash-of-the-carriers-tillman": {
+      "url": "https://www.audible.com/pd/Clash-of-the-Carriers-Audiobook/B07F39K4RK"
+    },
+    "red-blood-black-sand-tatum": {
+      "url": "https://www.audible.com/pd/Red-Blood-Black-Sand-Audiobook/B00IK4N4SI"
+    },
+    "utmost-savagery-alexander": {
+      "url": "https://www.audible.com/pd/Utmost-Savagery-Audiobook/B004I714Q0"
+    },
+    "brotherhood-of-heroes-sloan": {
+      "url": "https://www.audible.com/pd/Brotherhood-of-Heroes-Audiobook/B002V1LM3A"
+    },
+    "ghost-mountain-boys-campbell": {
+      "url": "https://www.audible.com/pd/The-Ghost-Mountain-Boys-Audiobook/B002VACJEW"
+    },
+    "boys-of-pointe-du-hoc-brinkley": {
+      "url": "https://www.audible.com/pd/The-Boys-of-Pointe-du-Hoc-Audiobook/B002V8HAGQ"
+    },
+    "dog-company-o-donnell": {
+      "url": "https://www.audible.com/pd/Dog-Company-Audiobook/B009OUKPG6"
+    },
+    "no-better-place-to-die-murphy": {
+      "url": "https://www.audible.com/pd/No-Better-Place-to-Die-Audiobook/B00BW6TDOU"
+    },
+    "battle-for-leyte-gulf-woodward": {
+      "url": "https://www.audible.com/pd/The-Battle-for-Leyte-Gulf-Audiobook/B08B4385B9"
+    },
+    "fighter-the-true-story-of-the-battle-of-britain-deighton": {
+      "url": "https://www.audible.com/pd/Fighter-Audiobook/B0DSJW7RHP"
+    },
+    "first-light-wellum": {
+      "url": "https://www.audible.com/pd/First-Light-Audiobook/B07CTCDW14"
+    },
+    "d-day-the-battle-for-normandy-beevor": {
+      "url": "https://www.audible.com/pd/D-Day-Audiobook/B0036NA8PK"
+    },
+    "when-the-sea-came-alive-graff": {
+      "url": "https://www.audible.com/pd/When-the-Sea-Came-Alive-Audiobook/B0CLFFHSG3"
+    },
+    "arnhem-the-battle-for-the-bridges-beevor": {
+      "url": "https://www.audible.com/pd/Arnhem-Audiobook/B07B41NQZ4"
+    },
+    "dead-and-those-about-to-die-mcmanus": {
+      "url": "https://www.audible.com/pd/The-Dead-and-Those-About-to-Die-Audiobook/B00K5T77E8"
+    },
+    "fire-and-fortitude-mcmanus": {
+      "url": "https://www.audible.com/pd/Fire-and-Fortitude-Audiobook/1984888374"
+    },
+    "island-infernos-mcmanus": {
+      "url": "https://www.audible.com/pd/Island-Infernos-Audiobook/0593457757"
+    },
+    "to-the-end-of-the-earth-mcmanus": {
+      "url": "https://www.audible.com/pd/To-the-End-of-the-Earth-Audiobook/B0BBY816LC"
+    },
+    "mission-beyond-darkness-reed": {
+      "url": "https://www.audible.com/pd/Mission-Beyond-Darkness-Audiobook/B08B2GKTQC"
+    },
+    "omaha-beach-balkoski": {
+      "url": "https://www.audible.com/pd/Omaha-Beach-Audiobook/B0F6954WHR"
+    },
+    "operation-neptune-symonds": {
+      "url": "https://www.audible.com/pd/Neptune-Audiobook/B00PWE994M"
+    },
+    "pacific-payback-moore": {
+      "url": "https://www.audible.com/pd/Pacific-Payback-Audiobook/B00KY8YCFW"
+    },
+    "sand-and-steel-caddick-adams": {
+      "url": "https://www.audible.com/pd/Sand-and-Steel-Audiobook/1705213200"
+    },
+    "september-hope-mcmanus": {
+      "url": "https://www.audible.com/pd/September-Hope-Audiobook/B008GVY9H0"
+    },
+    "utah-beach-balkoski": {},
+    "for-crew-and-country-wukovits": {
+      "url": "https://www.audible.com/pd/For-Crew-and-Country-Audiobook/B009RT3HBO"
+    },
+    "tin-can-titans-wukovits": {
+      "url": "https://www.audible.com/pd/Tin-Can-Titans-Audiobook/B074JL8LBC"
+    },
+    "dogfight-over-tokyo-wukovits": {},
+    "d-day-in-the-pacific-the-battle-of-saipan-goldberg": {
+      "url": "https://www.audible.com/pd/D-Day-in-the-Pacific-Audiobook/B00EPL5TH4"
+    },
+    "hero-of-hacksaw-ridge-herndon": {
+      "url": "https://www.audible.com/pd/Redemption-at-Hacksaw-Ridge-Audiobook/B01N9GZ33U",
+      "note": "On Audible as Redemption at Hacksaw Ridge."
+    },
+    "darby-s-rangers-we-led-the-way-darby": {
+      "url": "https://www.audible.com/pd/Darbys-Rangers-Audiobook/B008KOBFKW",
+      "note": "Audible has an abridged reading."
+    },
+    "big-week-holland": {
+      "url": "https://www.audible.com/pd/Big-Week-Audiobook/B07JN78BG5"
+    },
+    "americans-at-d-day-mcmanus": {
+      "url": "https://www.audible.com/pd/The-Americans-at-D-Day-Audiobook/B07888PRPM"
+    },
+    "twilight-of-the-gods-toll": {},
+    "leyte-gulf-a-new-history-of-the-world-s-largest-sea-battle-stille": {
+      "url": "https://www.audible.com/pd/Leyte-Gulf-Audiobook/B0BY3H595X"
+    },
+    "battle-of-leyte-gulf-the-last-fleet-action-willmott": {
+      "url": "https://www.audible.com/pd/The-Battle-of-Leyte-Gulf-The-Last-Fleet-Action-Audiobook/B00US5GNSA"
+    },
+    "goodbye-darkness-manchester": {},
+    "black-thursday-caidin": {},
+    "brave-men-pyle": {
+      "url": "https://www.audible.com/pd/Brave-Men-Audiobook/B0BW4V5SZ7",
+      "note": "Some stores say this edition uses a computer voice."
+    },
+    "war-as-i-knew-it-patton": {}
+  }
 }
