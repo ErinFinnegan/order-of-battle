@@ -1,0 +1,1254 @@
+<title>Order of Battle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Stardos+Stencil:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* Layout: a field-manual dossier. One wide column, tabs as file dividers, big type and big buttons for a listener with weak eyes. */
+:root{
+  --paper:#E8E9DF; --card:#F6F6F0; --ink:#1D2118; --muted:#596050; --line:#C5C8B6;
+  --olive:#4A5A26; --olive-ink:#F4F6EA; --up:#2E6A39; --side:#8A6B12; --down:#A0342A; --soft:#DCDFCF; --hl:#FFC629; --hl-ink:#14170F;
+  --display:"Stardos Stencil", "Arial Narrow", Impact, sans-serif;
+  --body:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"Courier Prime", "Courier New", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#13160F; --card:#1C2016; --ink:#E7E9DD; --muted:#A2A893; --line:#353B2B;
+  --olive:#A9BC78; --olive-ink:#141710; --up:#80C48C; --side:#D9B85C; --down:#E5806F; --soft:#262B1E; --hl:#FFD24A; --hl-ink:#14170F; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --paper:#13160F; --card:#1C2016; --ink:#E7E9DD; --muted:#A2A893; --line:#353B2B;
+  --olive:#A9BC78; --olive-ink:#141710; --up:#80C48C; --side:#D9B85C; --down:#E5806F; --soft:#262B1E; --hl:#FFD24A; --hl-ink:#14170F; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--paper); color:var(--ink); font-family:var(--body); font-size:18px; line-height:1.5}
+.wrap{max-width:980px; margin:0 auto; padding-inline:16px; padding-block:20px 64px}
+h1,h2,h3{text-wrap:balance; margin:0}
+button{font:inherit; color:inherit}
+a{color:var(--olive)}
+:focus-visible{outline:3px solid var(--olive); outline-offset:2px}
+.mono{font-family:var(--mono)}
+.muted{color:var(--muted)}
+.lbl{font-family:var(--mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+
+header.top{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:8px 24px; border-bottom:3px double var(--ink); padding-bottom:10px}
+header.top h1{font-family:var(--display); font-weight:700; font-size:clamp(34px,6vw,54px); letter-spacing:.04em; line-height:1}
+header.top .sub{font-family:var(--mono); font-size:14px; color:var(--muted)}
+.tally{font-family:var(--mono); font-size:14px; text-align:right; font-variant-numeric:tabular-nums}
+
+.notice{margin-top:12px; padding:10px 14px; border:1px dashed var(--line); font-size:15px; color:var(--muted)}
+
+nav.tabs{display:flex; flex-wrap:wrap; gap:4px; margin-top:18px; border-bottom:1px solid var(--line)}
+nav.tabs button{background:transparent; border:1px solid transparent; border-bottom:none; padding:9px 14px; cursor:pointer; font-family:var(--mono); font-size:15px; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); border-radius:4px 4px 0 0}
+nav.tabs button[aria-selected="true"]{background:var(--card); border-color:var(--line); color:var(--ink); margin-bottom:-1px; font-weight:700}
+section.pane{padding-top:22px}
+
+.row{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.seg{display:inline-flex; flex-wrap:wrap; border:1px solid var(--line); border-radius:6px; overflow:hidden}
+.seg button{border:none; background:transparent; padding:7px 12px; cursor:pointer; font-size:15px}
+.seg button[aria-pressed="true"]{background:var(--olive); color:var(--olive-ink)}
+.statusseg button{padding:8px 12px}
+.seg button:focus-visible{background:var(--hl); color:var(--hl-ink); outline:3px solid var(--ink); outline-offset:-3px}
+.btn{border:1px solid var(--ink); background:var(--card); padding:9px 16px; border-radius:6px; cursor:pointer; font-size:16px}
+.btn.primary{background:var(--olive); color:var(--olive-ink); border-color:var(--olive)}
+.btn:disabled{opacity:.5; cursor:default}
+.linkbtn{background:none; border:none; padding:0; color:var(--olive); text-decoration:underline; cursor:pointer; font-size:inherit}
+
+/* the dossier card */
+.dossier{background:var(--card); border:1px solid var(--line); border-radius:4px; padding:clamp(18px,4vw,34px); margin-top:16px; position:relative}
+.dossier .serial{font-family:var(--mono); font-size:14px; color:var(--muted); display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.dossier h2{font-family:var(--body); font-weight:700; font-size:clamp(28px,4.6vw,40px); line-height:1.15; margin-top:12px}
+.dossier .by{font-size:22px; margin-top:6px}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:14px}
+.chip{font-family:var(--mono); font-size:13px; padding:3px 9px; border:1px solid var(--line); border-radius:3px; background:var(--paper)}
+.chip.found{border-color:var(--olive); color:var(--olive)}
+.about{margin:14px 0 0; font-size:19px; line-height:1.45; max-width:62ch}
+.guess{margin-top:14px; font-size:16px; color:var(--muted)}
+.guess b{color:var(--ink)}
+
+.verdicts{display:grid; grid-template-columns:4fr 3fr; gap:12px 18px; margin-top:24px}
+.vgroup .lbl{margin-bottom:6px}
+.vrow{display:grid; gap:8px}
+.vrow.r4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.vrow.r3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:820px){ .verdicts{grid-template-columns:1fr} }
+/* on a phone the buttons ride along the bottom of the screen so he never has to scroll to answer */
+@media (max-width:640px){
+  .verdicts{position:sticky; bottom:env(safe-area-inset-bottom,0px); background:var(--card); padding-block:10px; margin-inline:-6px; padding-inline:6px; gap:8px; z-index:2; box-shadow:0 -8px 12px -8px rgba(0,0,0,.25)}
+  .verdict{min-height:78px; padding:8px 3px; font-size:14px}
+  .verdict svg{width:30px; height:30px}
+  .verdict .k{display:none}
+  .keyhint{display:none}
+}
+/* the highlighted answer: solid yellow with a thick dark ring, so it can't be missed */
+.verdicts .verdict:focus, .verdicts .verdict:focus-visible{background:var(--hl); color:var(--hl-ink); border-color:var(--hl-ink); border-width:3px; outline:5px solid var(--ink); outline-offset:3px; transform:scale(1.06); box-shadow:0 6px 18px rgba(0,0,0,.35); position:relative; z-index:3}
+.verdicts .verdict:focus .k{color:var(--hl-ink)}
+.skiprow .btn:focus, .skiprow .btn:focus-visible{background:var(--hl); color:var(--hl-ink); border:3px solid var(--hl-ink); outline:5px solid var(--ink); outline-offset:3px}
+.mini button:focus, .mini button:focus-visible{background:var(--hl); color:var(--hl-ink); border-color:var(--hl-ink); outline:3px solid var(--ink); outline-offset:2px}
+.dossier h2 .hlt{background:var(--hl); color:var(--hl-ink); padding:.04em .28em; -webkit-box-decoration-break:clone; box-decoration-break:clone; border-radius:3px}
+@media (prefers-reduced-motion:reduce){ .verdict:focus{transform:none} }
+.skiprow{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px 16px; margin-top:14px}
+.keyhint{font-family:var(--mono); font-size:14px; color:var(--muted)}
+.keyhint kbd{font-family:var(--mono); border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; padding:0 6px; background:var(--paper); color:var(--ink)}
+.item:focus, .item:focus-visible{outline:4px solid var(--ink); outline-offset:-4px; background:var(--hl); color:var(--hl-ink)}
+.item:focus .m{color:var(--hl-ink)}
+.item:focus-within:not(:focus){background:var(--soft)}
+/* the large-print list */
+.biglist{list-style:none; margin:0; padding:0; counter-reset:n}
+.biglist li{padding:18px 4px; border-bottom:2px solid var(--line); display:grid; grid-template-columns:3ch minmax(0,1fr); gap:4px 14px; counter-increment:n}
+.biglist li::before{content:counter(n); font-family:var(--mono); font-size:28px; font-weight:700; color:var(--muted); grid-row:span 2}
+.biglist .bt{font-size:clamp(26px,4.4vw,36px); font-weight:700; line-height:1.15}
+.biglist .ba{font-size:clamp(19px,3vw,24px); color:var(--muted)}
+.sizer{display:inline-flex; gap:4px; margin-top:6px}
+.sizer button{border:1px solid var(--line); background:var(--card); border-radius:4px; padding:2px 10px; cursor:pointer; font-family:var(--mono); font-size:14px}
+.verdict{display:flex; flex-direction:column; align-items:center; gap:6px; padding:14px 6px 12px; border:2px solid var(--line); border-radius:8px; background:var(--paper); cursor:pointer; font-size:16px; font-weight:600; line-height:1.2; text-align:center}
+.verdict:hover{border-color:var(--ink)}
+.verdict svg{width:40px; height:40px}
+.verdict .k{font-family:var(--mono); font-size:12px; font-weight:400; color:var(--muted)}
+.verdict.up{color:var(--up)} .verdict.side{color:var(--side)} .verdict.down{color:var(--down)}
+.verdict.unread,.verdict.nope,.verdict.forgot,.verdict.nobattle{color:var(--ink)}
+.verdict.up:hover{border-color:var(--up)} .verdict.side:hover{border-color:var(--side)} .verdict.down:hover{border-color:var(--down)}
+
+.after{margin-top:16px; padding:12px 14px; border-left:3px solid var(--line); font-size:16px}
+.after .row{margin-top:8px}
+.reason{border:1px solid var(--line); background:var(--card); border-radius:20px; padding:4px 12px; cursor:pointer; font-size:14px}
+.reason[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+
+/* stamps for verdicts */
+.stamp{font-family:var(--display); font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:14px; padding:2px 8px; border:2px solid currentColor; border-radius:3px; display:inline-block; transform:rotate(-3deg); white-space:nowrap}
+.stamp.up{color:var(--up)} .stamp.side{color:var(--side)} .stamp.down{color:var(--down)} .stamp.unread{color:var(--olive)} .stamp.nope,.stamp.read,.stamp.forgot,.stamp.nobattle{color:var(--muted)}
+
+/* list views */
+.filters{display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; margin-bottom:14px}
+input[type=search], textarea{font:inherit; font-size:16px; padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:var(--card); color:var(--ink); width:100%}
+.filters input[type=search]{max-width:320px}
+.list{display:flex; flex-direction:column; border-top:1px solid var(--line)}
+.item{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px 16px; padding:12px 2px; border-bottom:1px solid var(--line); align-items:center}
+.item .t{font-weight:700; font-size:18px}
+.item .m{font-size:15px; color:var(--muted)}
+.mini{display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end}
+.mini button{border:1px solid var(--line); background:var(--card); border-radius:5px; padding:4px 8px; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:4px}
+.mini button svg{width:18px; height:18px}
+.mini button[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+@media (max-width:640px){ .item{grid-template-columns:1fr} .mini{justify-content:flex-start} }
+
+/* recommendations */
+.rec{display:grid; grid-template-columns:64px minmax(0,1fr); gap:6px 16px; padding:16px 2px; border-bottom:1px solid var(--line)}
+.meter{font-family:var(--mono); font-size:26px; font-weight:700; text-align:center; font-variant-numeric:tabular-nums; line-height:1}
+.meter small{display:block; font-size:11px; font-weight:400; color:var(--muted); letter-spacing:.06em; margin-top:4px}
+.why{font-size:15px; margin-top:4px}
+.why .pos{color:var(--up)} .why .neg{color:var(--down)}
+.where{display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:6px; font-size:14px; font-family:var(--mono)}
+.badge{font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; padding:2px 7px; border-radius:3px; background:var(--soft); color:var(--muted)}
+.badge.ok{background:var(--olive); color:var(--olive-ink)}
+
+.tonight{background:var(--card); border:1px solid var(--line); border-radius:4px; padding:14px 16px; margin-bottom:16px}
+.chip.avoid{border-color:var(--down); color:var(--down); display:inline-flex; gap:6px; align-items:center; font-size:14px}
+.chip.avoid .linkbtn{color:var(--down); text-decoration:none; font-size:16px}
+/* learned */
+.grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px}
+.bar{display:grid; grid-template-columns:minmax(0,1fr) 110px; gap:10px; align-items:center; padding:5px 0; font-size:16px}
+.bar .track{height:10px; background:var(--soft); border-radius:2px; position:relative; overflow:hidden}
+.bar .fill{position:absolute; top:0; bottom:0; left:0}
+.summary{background:var(--card); border:1px solid var(--line); padding:16px 18px; border-radius:4px; white-space:pre-wrap; font-size:17px}
+
+/* authors */
+.author{padding:14px 2px; border-bottom:1px solid var(--line)}
+.author h3{font-size:20px}
+.author ul{margin:6px 0 0; padding-left:20px; font-size:15px}
+
+/* sources */
+.sources{display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px}
+.src{background:var(--card); border:1px solid var(--line); border-radius:4px; padding:16px 18px}
+.src.top{border:2px solid var(--olive)}
+.src h3{font-size:20px}
+.src .cost{font-family:var(--mono); font-size:13px; color:var(--muted); margin-top:2px}
+.src p{font-size:16px; margin:8px 0 0}
+
+.empty{padding:28px 18px; border:1px dashed var(--line); text-align:center; color:var(--muted); margin-top:16px}
+.status{font-family:var(--mono); font-size:14px; color:var(--muted); margin-top:8px; min-height:1.4em}
+.toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(18px + env(safe-area-inset-bottom,0px)); background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:6px; font-size:16px; display:flex; gap:14px; align-items:center; max-width:calc(100% - 32px)}
+.toast button{background:none; border:1px solid currentColor; color:inherit; border-radius:4px; padding:3px 10px; cursor:pointer}
+details summary{cursor:pointer; font-weight:600}
+@media (prefers-reduced-motion:no-preference){ .dossier.flip{animation:flip .22s ease-out} @keyframes flip{from{opacity:.3; transform:translateY(6px)} to{opacity:1; transform:none}} }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Order of Battle</h1>
+      <div class="sub">Dad's WWII listening list · nonfiction only</div>
+    </div>
+    <div class="tally"><div id="tally"></div><div class="sizer" role="group" aria-label="Text size"><button data-size="-1" aria-label="Smaller text">A−</button><button data-size="1" aria-label="Bigger text">A+</button></div></div>
+  </header>
+  <div class="notice" id="notice" hidden></div>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-tab="rate">Sort the shelf</button>
+    <button role="tab" data-tab="next">Up next</button>
+    <button role="tab" data-tab="tohear">His list</button>
+    <button role="tab" data-tab="authors">Authors</button>
+    <button role="tab" data-tab="learned">What it's learned</button>
+    <button role="tab" data-tab="find">Find more</button>
+    <button role="tab" data-tab="listen">Where to listen</button>
+  </nav>
+
+  <section class="pane" id="pane-rate" hidden></section>
+  <section class="pane" id="pane-next" hidden></section>
+  <section class="pane" id="pane-tohear" hidden></section>
+  <section class="pane" id="pane-authors" hidden></section>
+  <section class="pane" id="pane-learned" hidden></section>
+  <section class="pane" id="pane-find" hidden></section>
+  <section class="pane" id="pane-listen" hidden></section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ---------- seed catalog ----------
+   Title|Author|Year|Theater|Branch|Form|tags
+   Theater: E NW Europe · B Battle of Britain · M N.Africa/Sicily/Italy · A air war over Europe · P Pacific · C China-Burma-India · T Atlantic · G whole war
+   Listed roughly best-known first, so the sorting pass clears what he's already heard early. */
+const SEED = `
+Band of Brothers|Stephen E. Ambrose|1992|E|abn|unit|easy-company,d-day,bulge,small-unit
+With the Old Breed|E. B. Sledge|1981|P|usmc|memoir|peleliu,okinawa,small-unit
+Unbroken|Laura Hillenbrand|2010|P|aaf|bio|pow,bomber,survival
+Flags of Our Fathers|James Bradley|2000|P|usmc|history|iwo-jima
+The Longest Day|Cornelius Ryan|1959|E|multi|history|d-day
+Citizen Soldiers|Stephen E. Ambrose|1997|E|army|history|normandy,bulge,small-unit
+D-Day: June 6, 1944|Stephen E. Ambrose|1994|E|multi|history|d-day
+A Bridge Too Far|Cornelius Ryan|1974|E|multi|history|market-garden,abn
+Helmet for My Pillow|Robert Leckie|1957|P|usmc|memoir|guadalcanal,peleliu,small-unit
+An Army at Dawn|Rick Atkinson|2002|M|army|history|north-africa,generals
+The Day of Battle|Rick Atkinson|2007|M|army|history|sicily,italy,anzio
+The Guns at Last Light|Rick Atkinson|2013|E|army|history|normandy,bulge,generals
+The Pacific|Hugh Ambrose|2010|P|usmc|history|guadalcanal,peleliu,iwo-jima,okinawa
+Ghost Soldiers|Hampton Sides|2001|P|ranger|history|philippines,pow,rescue
+The Last Stand of the Tin Can Sailors|James D. Hornfischer|2004|P|navy|history|leyte-gulf,destroyers
+Masters of the Air|Donald L. Miller|2006|A|aaf|history|bomber,eighth-air-force
+The Wild Blue|Stephen E. Ambrose|2001|A|aaf|history|bomber,b-24,italy
+A Higher Call|Adam Makos|2012|A|aaf|history|bomber,b-17,pilot,eighth-air-force
+Flyboys|James Bradley|2003|P|navy|history|pilot,pow,chichi-jima
+Shattered Sword|Jonathan Parshall & Anthony Tully|2005|P|navy|history|midway,carriers
+Neptune's Inferno|James D. Hornfischer|2011|P|navy|history|guadalcanal,surface-battle
+Ship of Ghosts|James D. Hornfischer|2006|P|navy|history|pow,uss-houston
+The Fleet at Flood Tide|James D. Hornfischer|2016|P|navy|history|marianas,carriers,saipan
+Pacific Crucible|Ian W. Toll|2011|P|navy|history|pearl-harbor,midway,carriers
+The Conquering Tide|Ian W. Toll|2015|P|navy|history|guadalcanal,tarawa,carriers
+Twilight of the Gods|Ian W. Toll|2020|P|navy|history|leyte-gulf,iwo-jima,okinawa
+Beyond Band of Brothers|Dick Winters & Cole C. Kingseed|2006|E|abn|memoir|easy-company,d-day,officer
+Parachute Infantry|David Kenyon Webster|1994|E|abn|memoir|easy-company,small-unit
+Brothers in Battle, Best of Friends|William Guarnere & Edward Heffron|2007|E|abn|memoir|easy-company,bulge
+Goodbye, Darkness|William Manchester|1980|P|usmc|memoir|okinawa,small-unit
+American Caesar|William Manchester|1978|P|army|bio|macarthur,generals
+The Bedford Boys|Alex Kershaw|2003|E|army|history|d-day,small-unit
+The Longest Winter|Alex Kershaw|2004|E|army|history|bulge,small-unit,pow
+The Liberator|Alex Kershaw|2012|M|army|bio|sicily,anzio,dachau,officer
+Escape from the Deep|Alex Kershaw|2008|P|sub|history|uss-tang,pow,survival
+The First Wave|Alex Kershaw|2019|E|multi|history|d-day
+Against All Odds|Alex Kershaw|2022|M|army|history|audie-murphy,italy,medal-of-honor
+To Hell and Back|Audie Murphy|1949|M|army|memoir|sicily,anzio,france,medal-of-honor,small-unit
+Brave Men|Ernie Pyle|1944|E|army|corr|sicily,italy,normandy,small-unit
+Here Is Your War|Ernie Pyle|1943|M|army|corr|north-africa,small-unit
+Up Front|Bill Mauldin|1945|M|army|corr|italy,small-unit,cartoons
+War As I Knew It|George S. Patton Jr.|1947|E|army|memoir|generals,third-army
+Crusade in Europe|Dwight D. Eisenhower|1948|E|multi|memoir|generals,strategy
+A Soldier's Story|Omar N. Bradley|1951|E|army|memoir|generals
+Patton: A Genius for War|Carlo D'Este|1995|E|army|bio|generals,third-army
+Death Traps|Belton Y. Cooper|1998|E|armor|memoir|tanks,third-armored
+Company Commander|Charles B. MacDonald|1947|E|army|memoir|bulge,hurtgen,officer,small-unit
+A Time for Trumpets|Charles B. MacDonald|1985|E|army|history|bulge
+The Rising Sun|John Toland|1970|P|multi|history|japanese-view,strategy
+Battle: The Story of the Bulge|John Toland|1959|E|army|history|bulge
+Guadalcanal Diary|Richard Tregaskis|1943|P|usmc|corr|guadalcanal
+Guadalcanal|Richard B. Frank|1990|P|multi|history|guadalcanal
+Downfall|Richard B. Frank|1999|P|multi|history|strategy,invasion-of-japan
+Tower of Skulls|Richard B. Frank|2020|P|multi|history|strategy,china,philippines
+Miracle at Midway|Gordon W. Prange|1982|P|navy|history|midway,carriers
+At Dawn We Slept|Gordon W. Prange|1981|P|navy|history|pearl-harbor
+Incredible Victory|Walter Lord|1967|P|navy|history|midway,carriers
+Day of Infamy|Walter Lord|1957|P|navy|history|pearl-harbor
+Lonely Vigil|Walter Lord|1977|P|navy|history|coastwatchers,guadalcanal,solomons
+Tears in the Darkness|Michael Norman & Elizabeth M. Norman|2009|P|army|history|bataan,pow
+In Harm's Way|Doug Stanton|2001|P|navy|history|uss-indianapolis,survival
+Indianapolis|Lynn Vincent & Sara Vladic|2018|P|navy|history|uss-indianapolis,survival
+Abandon Ship!|Richard F. Newcomb|1958|P|navy|history|uss-indianapolis,survival
+Savo|Richard F. Newcomb|1961|P|navy|history|guadalcanal,surface-battle
+Iwo Jima|Richard F. Newcomb|1965|P|usmc|history|iwo-jima
+Baa Baa Black Sheep|Gregory Boyington|1958|P|usmc|memoir|pilot,fighter,pow
+Black Sheep One|Bruce Gamble|2000|P|usmc|bio|pilot,fighter
+Fortress Rabaul|Bruce Gamble|2010|P|multi|history|rabaul,new-guinea,pilot
+Thunder Below!|Eugene B. Fluckey|1992|P|sub|memoir|uss-barb,medal-of-honor
+Clear the Bridge!|Richard H. O'Kane|1977|P|sub|memoir|uss-tang,medal-of-honor
+Wahoo|Richard H. O'Kane|1987|P|sub|memoir|uss-wahoo
+Silent Victory|Clay Blair Jr.|1975|P|sub|history|strategy
+Take Her Deep!|I. J. Galantin|1987|P|sub|memoir|uss-halibut
+Thunderbolt!|Robert S. Johnson & Martin Caidin|1958|A|aaf|memoir|pilot,fighter,p-47,eighth-air-force
+Yeager|Chuck Yeager & Leo Janos|1985|A|aaf|memoir|pilot,fighter
+Serenade to the Big Bird|Bert Stiles|1947|A|aaf|memoir|bomber,b-17,eighth-air-force
+Black Thursday|Martin Caidin|1960|A|aaf|history|bomber,b-17,schweinfurt,eighth-air-force
+The Fall of Fortresses|Elmer Bendiner|1980|A|aaf|memoir|bomber,b-17,schweinfurt,eighth-air-force
+Combat Crew|John Comer|1988|A|aaf|memoir|bomber,b-17,gunner,eighth-air-force
+The Mighty Eighth|Gerald Astor|1997|A|aaf|oral|bomber,eighth-air-force
+Wings of Morning|Thomas Childers|1995|A|aaf|history|bomber,b-24
+Hell Hawks!|Robert F. Dorr & Thomas D. Jones|2008|E|aaf|history|pilot,fighter,p-47,close-support
+Lucky 666|Bob Drury & Tom Clavin|2016|P|aaf|history|bomber,b-17,medal-of-honor
+Halsey's Typhoon|Bob Drury & Tom Clavin|2007|P|navy|history|destroyers,survival
+Lightning Down|Tom Clavin|2018|E|aaf|bio|pilot,p-38,pow
+Thirty Seconds Over Tokyo|Ted W. Lawson|1943|P|aaf|memoir|doolittle-raid,bomber
+Target Tokyo|James M. Scott|2015|P|aaf|history|doolittle-raid,bomber
+Rampage|James M. Scott|2018|P|army|history|philippines,manila
+Black Snow|James M. Scott|2022|P|aaf|history|bomber,b-29,tokyo
+The Bomber Mafia|Malcolm Gladwell|2021|G|aaf|history|bomber,b-29,strategy
+Whirlwind|Barrett Tillman|2010|P|aaf|history|bomber,b-29
+Clash of the Carriers|Barrett Tillman|2005|P|navy|history|carriers,marianas,pilot
+Sea of Thunder|Evan Thomas|2006|P|navy|history|leyte-gulf,admirals
+The Admirals|Walter R. Borneman|2012|G|navy|bio|admirals,strategy
+MacArthur at War|Walter R. Borneman|2016|P|army|bio|macarthur,generals,philippines
+Brothers Down|Walter R. Borneman|2019|P|navy|history|pearl-harbor,uss-arizona
+Eagle Against the Sun|Ronald H. Spector|1985|P|multi|history|strategy
+But Not in Shame|John Toland|1961|P|multi|history|pearl-harbor,bataan,wake-island
+Strong Men Armed|Robert Leckie|1962|P|usmc|history|guadalcanal,tarawa,iwo-jima,okinawa
+Challenge for the Pacific|Robert Leckie|1965|P|usmc|history|guadalcanal
+Okinawa: The Last Battle of World War II|Robert Leckie|1995|P|multi|history|okinawa
+Islands of the Damned|R. V. Burgin & Bill Marvel|2010|P|usmc|memoir|peleliu,okinawa,small-unit
+Red Blood, Black Sand|Chuck Tatum|2012|P|usmc|memoir|iwo-jima,small-unit
+Tarawa: The Story of a Battle|Robert Sherrod|1944|P|usmc|corr|tarawa
+Into the Valley|John Hersey|1943|P|usmc|corr|guadalcanal,small-unit
+The Island|Herbert C. Merillat|1944|P|usmc|history|guadalcanal
+Coral and Brass|Holland M. Smith|1949|P|usmc|memoir|generals,saipan,iwo-jima
+Utmost Savagery|Joseph H. Alexander|1995|P|usmc|history|tarawa
+One Square Mile of Hell|John Wukovits|2006|P|usmc|history|tarawa
+Hell from the Heavens|John Wukovits|2015|P|navy|history|destroyers,kamikaze,okinawa
+Pacific Alamo|John Wukovits|2003|P|usmc|history|wake-island
+Given Up for Dead|Bill Sloan|2003|P|usmc|history|wake-island,pow
+Brotherhood of Heroes|Bill Sloan|2005|P|usmc|history|peleliu
+The Ultimate Battle|Bill Sloan|2007|P|multi|history|okinawa
+The Devil's Anvil|James H. Hallas|1994|P|usmc|history|peleliu
+Killing Ground on Okinawa|James H. Hallas|1996|P|usmc|history|okinawa,sugar-loaf
+The Bloody Battle for Suribachi|Richard Wheeler|1965|P|usmc|memoir|iwo-jima,small-unit
+A Special Valor|Richard Wheeler|1983|P|usmc|history|guadalcanal,tarawa,iwo-jima
+Tennozan|George Feifer|1992|P|multi|history|okinawa,japanese-view
+Crucible of Hell|Saul David|2020|P|multi|history|okinawa
+Bloody Okinawa|Joseph Wheelan|2020|P|multi|history|okinawa
+Midnight in the Pacific|Joseph Wheelan|2017|P|multi|history|guadalcanal
+Ghosts of Honolulu|Mark Harmon & Leon Carroll Jr.|2023|P|navy|history|pearl-harbor,intelligence
+The Thousand-Mile War|Brian Garfield|1969|P|multi|history|aleutians
+Our Jungle Road to Tokyo|Robert L. Eichelberger|1950|P|army|memoir|generals,new-guinea,philippines
+The Ghost Mountain Boys|James Campbell|2007|P|army|history|new-guinea,buna,small-unit
+Bloody Buna|Lida Mayo|1974|P|army|history|new-guinea,buna
+Lost in Shangri-La|Mitchell Zuckoff|2011|P|army|history|new-guinea,survival,rescue
+As Good As Dead|Stephen L. Moore|2016|P|multi|history|pow,palawan,survival
+Some Survived|Manny Lawton|1984|P|army|memoir|bataan,pow
+They Were Expendable|W. L. White|1942|P|navy|corr|philippines,pt-boats
+Queen of the Flat-Tops|Stanley Johnston|1942|P|navy|corr|uss-lexington,coral-sea,carriers
+Into the Rising Sun|Patrick K. O'Donnell|2002|P|multi|oral|small-unit
+Voices of the Pacific|Adam Makos & Marcus Brotherton|2013|P|usmc|oral|guadalcanal,peleliu,okinawa
+Spearhead|Adam Makos|2019|E|armor|history|tanks,third-armored,cologne
+Brothers in Arms: The Epic Story of the 761st Tank Battalion|Kareem Abdul-Jabbar & Anthony Walton|2004|E|armor|unit|tanks,bulge,black-soldiers
+Another River, Another Town|John P. Irwin|2002|E|armor|memoir|tanks,third-armored
+Armored Thunderbolt|Steven J. Zaloga|2008|E|armor|ref|tanks,sherman
+The Men of Company K|Harold P. Leinbaugh & John D. Campbell|1985|E|army|unit|bulge,small-unit
+If You Survive|George Wilson|1987|E|army|memoir|normandy,hurtgen,bulge,officer,small-unit
+Roll Me Over|Raymond Gantter|1997|E|army|memoir|hurtgen,bulge,small-unit
+Doing Battle|Paul Fussell|1996|E|army|memoir|officer,small-unit
+The Boys' Crusade|Paul Fussell|2003|E|army|history|small-unit
+The Clay Pigeons of St. Lo|Glover S. Johns Jr.|1958|E|army|memoir|normandy,officer
+Follow Me and Die|Cecil B. Currey|1984|E|army|history|hurtgen
+When the Odds Were Even|Keith E. Bonn|1994|E|army|history|vosges,alsace
+The Bridge at Remagen|Ken Hechler|1957|E|army|history|remagen,rhine
+Patton's Ghost Corps|Nathan N. Prefer|1998|E|army|history|third-army,siegfried-line
+Lucky Forward|Robert S. Allen|1947|E|army|history|third-army,generals
+Brothers, Rivals, Victors|Jonathan W. Jordan|2011|E|army|history|generals
+Eisenhower's Lieutenants|Russell F. Weigley|1981|E|army|ref|generals,strategy
+Patton's War|Kevin M. Hymel|2021|M|army|history|generals,north-africa,sicily
+The Boys of Pointe du Hoc|Douglas Brinkley|2005|E|ranger|history|d-day
+Beyond Valor|Patrick K. O'Donnell|2001|E|ranger|oral|abn,small-unit
+Dog Company|Patrick K. O'Donnell|2012|E|ranger|unit|d-day,small-unit
+First SEALs|Patrick K. O'Donnell|2014|M|navy|history|oss,special-ops
+Currahee!|Donald R. Burgett|1967|E|abn|memoir|d-day,101st,small-unit
+The Road to Arnhem|Donald R. Burgett|1999|E|abn|memoir|market-garden,101st
+Seven Roads to Hell|Donald R. Burgett|1999|E|abn|memoir|bulge,bastogne,101st
+Night Drop|S. L. A. Marshall|1962|E|abn|history|d-day
+Bastogne: The First Eight Days|S. L. A. Marshall|1946|E|abn|history|bulge,bastogne
+Island Victory|S. L. A. Marshall|1944|P|army|history|kwajalein
+Men Against Fire|S. L. A. Marshall|1947|G|army|ref|small-unit,analysis
+Rendezvous with Destiny|Leonard Rapport & Arthur Northwood Jr.|1948|E|abn|unit|101st
+Ridgway's Paratroopers|Clay Blair Jr.|1985|E|abn|history|82nd,generals
+On to Berlin|James M. Gavin|1978|E|abn|memoir|82nd,generals
+Those Devils in Baggy Pants|Ross S. Carter|1951|M|abn|memoir|82nd,italy,small-unit
+Four Stars of Valor|Phil Nordyke|2006|E|abn|unit|82nd,505th
+No Better Place to Die|Robert M. Murphy|2009|E|abn|history|d-day,82nd
+Tonight We Die as Men|Ian Gardner & Roger Day|2009|E|abn|unit|d-day,101st
+Biggest Brother|Larry Alexander|2005|E|abn|bio|easy-company
+Shifty's War|Marcus Brotherton|2011|E|abn|bio|easy-company
+A Company of Heroes|Marcus Brotherton|2010|E|abn|oral|easy-company
+Call of Duty|Lynn "Buck" Compton & Marcus Brotherton|2008|E|abn|memoir|easy-company
+The Battle for Leyte Gulf|C. Vann Woodward|1947|P|navy|history|leyte-gulf,surface-battle
+Leyte|Samuel Eliot Morison|1958|P|navy|history|leyte-gulf,philippines
+The Two-Ocean War|Samuel Eliot Morison|1963|G|navy|history|strategy,leyte-gulf,midway
+The Battle of Leyte Gulf|Thomas J. Cutler|1994|P|navy|history|leyte-gulf,surface-battle
+The Battle of Leyte Gulf: The Last Fleet Action|H. P. Willmott|2005|P|navy|history|leyte-gulf,admirals
+The Battle Off Samar|Robert Jon Cox|2010|P|navy|history|leyte-gulf,destroyers,samar
+Leyte Gulf: A New History of the World's Largest Sea Battle|Mark E. Stille|2023|P|navy|history|leyte-gulf,surface-battle
+Bull Halsey|E. B. Potter|1985|P|navy|bio|admirals,leyte-gulf
+Leyte: The Return to the Philippines|M. Hamlin Cannon|1954|P|army|ref|leyte,philippines
+The Most Dangerous Enemy|Stephen Bungay|2000|B|raf|history|battle-of-britain,fighter
+Fighter: The True Story of the Battle of Britain|Len Deighton|1977|B|raf|history|battle-of-britain,fighter
+The Narrow Margin|Derek Wood & Derek Dempster|1961|B|raf|history|battle-of-britain
+Duel of Eagles|Peter Townsend|1970|B|raf|memoir|battle-of-britain,pilot,fighter
+The Last Enemy|Richard Hillary|1942|B|raf|memoir|battle-of-britain,pilot,fighter
+First Light|Geoffrey Wellum|2002|B|raf|memoir|battle-of-britain,pilot,fighter
+Reach for the Sky|Paul Brickhill|1954|B|raf|bio|battle-of-britain,pilot,fighter
+Fighter Boys|Patrick Bishop|2003|B|raf|history|battle-of-britain,pilot
+The Battle of Britain: Five Months That Changed History|James Holland|2010|B|raf|history|battle-of-britain
+Spitfire: Portrait of a Legend|Leo McKinstry|2007|B|raf|history|battle-of-britain,fighter,spitfire
+Hurricane: Victor of the Battle of Britain|Leo McKinstry|2010|B|raf|history|battle-of-britain,fighter
+The Few|Alex Kershaw|2006|B|raf|history|battle-of-britain,pilot,americans-in-raf
+Tumult in the Clouds|James A. Goodson|1983|A|aaf|memoir|pilot,fighter,americans-in-raf,eighth-air-force
+Kasserine Pass|Martin Blumenson|1967|M|army|history|north-africa
+Anzio: The Gamble That Failed|Martin Blumenson|1963|M|army|history|anzio
+Fatal Decision|Carlo D'Este|1991|M|army|history|anzio,generals
+Bitter Victory|Carlo D'Este|1988|M|army|history|sicily
+Decision in Normandy|Carlo D'Este|1983|E|multi|history|normandy,generals
+The Rock of Anzio|Flint Whitlock|1998|M|army|unit|45th-division,anzio
+The Last Ridge|McKay Jenkins|2003|M|army|history|10th-mountain,italy
+Cassino '44|James Holland|2024|M|multi|history|italy,cassino
+Sicily '43|James Holland|2020|M|multi|history|sicily
+Normandy '44|James Holland|2019|E|multi|history|normandy
+Brothers in Arms|James Holland|2021|E|brit|unit|tanks,normandy
+D-Day: The Battle for Normandy|Antony Beevor|2009|E|multi|history|normandy
+Ardennes 1944|Antony Beevor|2015|E|multi|history|bulge
+Overlord|Max Hastings|1984|E|multi|history|normandy
+Armageddon|Max Hastings|2004|E|multi|history|germany,strategy
+Retribution|Max Hastings|2007|P|multi|history|strategy,japan
+Operation Pedestal|Max Hastings|2021|T|brit|history|convoy,malta
+Six Armies in Normandy|John Keegan|1982|E|multi|history|normandy
+When the Sea Came Alive|Garrett M. Graff|2024|E|multi|oral|d-day
+Operation Drumbeat|Michael Gannon|1990|T|navy|history|u-boats,east-coast
+Torpedo Junction|Homer H. Hickam Jr.|1989|T|navy|history|u-boats,east-coast,coast-guard
+Hitler's U-Boat War|Clay Blair Jr.|1996|T|multi|history|u-boats
+The Marauders|Charlton Ogburn Jr.|1959|C|army|memoir|merrills-marauders,burma
+The Burma Road|Donovan Webster|2003|C|multi|history|burma,stilwell
+Flying Tigers|Daniel Ford|1991|C|aaf|history|pilot,fighter
+God Is My Co-Pilot|Robert L. Scott Jr.|1943|C|aaf|memoir|pilot,fighter
+The Stilwell Papers|Joseph W. Stilwell|1948|C|army|memoir|generals,stilwell
+The Good War|Studs Terkel|1984|G|multi|oral|home-front
+The Greatest Generation|Tom Brokaw|1998|G|multi|oral|profiles
+Masters and Commanders|Andrew Roberts|2008|G|multi|history|strategy,generals
+`;
+
+const THEATER = {E:"Northwest Europe", B:"Battle of Britain", M:"N. Africa & Italy", A:"Air war over Europe", P:"Pacific", C:"China-Burma-India", T:"Atlantic", G:"Whole war"};
+const BRANCH = {army:"Army infantry", abn:"Airborne", ranger:"Rangers & special ops", armor:"Tanks & armor", usmc:"Marines", navy:"Navy", sub:"Submarines", aaf:"Army Air Forces", multi:"Multiple services", brit:"British-led", raf:"RAF"};
+const FORM = {memoir:"Memoir", history:"History", oral:"Oral history", bio:"Biography", unit:"Unit history", corr:"War correspondent", ref:"Military analysis"};
+const ERA = y => y<1960 ? "Written during or just after the war" : y<1980 ? "1960s–70s" : y<2000 ? "1980s–90s" : y<2015 ? "2000s–early 2010s" : "Since 2015";
+
+const VERDICTS = [
+  {s:"up",      g:"read", label:"Liked it",                key:"1"},
+  {s:"side",    g:"read", label:"It was OK",               key:"2"},
+  {s:"down",    g:"read", label:"Didn't like it",          key:"3"},
+  {s:"forgot",  g:"read", label:"Read it, don't remember", key:"4"},
+  {s:"unread",  g:"new",  label:"Haven't heard it",        key:"5"},
+  {s:"nope",    g:"new",  label:"Not this book",           key:"6"},
+  {s:"nobattle",g:"new",  label:"Not this battle",         key:"7"},
+];
+const STAMP = {up:"Liked", side:"So-so", down:"Disliked", unread:"Not yet heard", nope:"Not this book", nobattle:"Not this battle", read:"Already read", forgot:"Forgotten"};
+// how much each verdict says about his taste; "haven't heard it" says nothing, "already read" says a little
+// "not this book" is a light nudge; "not this battle" lands on the subject and theater only
+const VAL = {up:1, side:0.1, down:-1, nope:-0.2, read:0.25, forgot:0.2, nobattle:0};
+const VAL_BY_GROUP = {nobattle:{tg:-1, th:-0.3}};
+const GROUP = {fe:{w:1.3,n:"Feel"}, th:{w:1.2,n:"Theater"}, br:{w:1.0,n:"Branch"}, fm:{w:1.0,n:"Kind of book"}, au:{w:1.6,n:"Author"}, era:{w:0.5,n:"When written"}, tg:{w:0.9,n:"Subject"}};
+const REASONS = ["Felt like the news, not action","Too dry / academic","Too much big-picture strategy","Not enough combat","Not enough Americans","Bad narrator","Too long","Too gory","Already knew the story"];
+/* Feel. He says sweeping narrative histories are "like watching the news", and he wants
+   something closer to an action movie. Books that follow a few men through the fighting are
+   "up close"; panoramic campaign and strategy histories are "big picture". Memoirs, unit
+   histories and the like default to up close; military analysis to big picture. */
+const FEEL_LABEL = {close:"Up close, like an action movie", big:"Big picture, like watching the news"};
+const FEEL_BIG_T = ["An Army at Dawn","The Day of Battle","The Guns at Last Light","Pacific Crucible","The Conquering Tide","Twilight of the Gods","Neptune's Inferno","The Fleet at Flood Tide","The Rising Sun","Guadalcanal","Downfall","Tower of Skulls","Shattered Sword","Eagle Against the Sun","Masters and Commanders","Overlord","Armageddon","Retribution","Six Armies in Normandy","D-Day: The Battle for Normandy","Ardennes 1944","Normandy '44","Sicily '43","Cassino '44","Silent Victory","Hitler's U-Boat War","The Two-Ocean War","The Admirals","The Bomber Mafia","Masters of the Air","Eisenhower's Lieutenants","Brothers, Rivals, Victors","A Time for Trumpets","Battle: The Story of the Bulge","Citizen Soldiers","D-Day: June 6, 1944","Strong Men Armed","Challenge for the Pacific","Okinawa: The Last Battle of World War II","Crucible of Hell","Bloody Okinawa","Midnight in the Pacific","Tennozan","The Thousand-Mile War","Kasserine Pass","Anzio: The Gamble That Failed","Fatal Decision","Bitter Victory","Decision in Normandy","Operation Drumbeat","The Burma Road","The Battle for Leyte Gulf","Leyte","The Battle of Leyte Gulf","The Battle of Leyte Gulf: The Last Fleet Action","Leyte Gulf: A New History of the World's Largest Sea Battle","Leyte: The Return to the Philippines","Sand and Steel","Fire and Fortitude","Island Infernos","To the End of the Earth","Operation Neptune","The Battle of Midway","Arnhem: The Battle for the Bridges","Operation Pedestal","At Dawn We Slept","Miracle at Midway","Whirlwind","Clash of the Carriers","Sea of Thunder","The Most Dangerous Enemy","Fighter: The True Story of the Battle of Britain","The Narrow Margin","The Battle of Britain: Five Months That Changed History","But Not in Shame","Rampage","Tears in the Darkness","Fortress Rabaul","A Special Valor","Patton's War","The Last Battle","The Ultimate Battle","Annapolis Goes to War"];
+const FEEL_CLOSE_T = ["Band of Brothers","The Bedford Boys","The Longest Winter","The Liberator","Against All Odds","The First Wave","A Higher Call","Spearhead","The Last Stand of the Tin Can Sailors","Ghost Soldiers","Flags of Our Fathers","Flyboys","Unbroken","Lucky 666","Halsey's Typhoon","Escape from the Deep","In Harm's Way","Indianapolis","Abandon Ship!","Lost in Shangri-La","As Good As Dead","Pegasus Bridge","The Boys of Pointe du Hoc","No Better Place to Die","Hell from the Heavens","One Square Mile of Hell","Pacific Payback","Target Tokyo","Black Thursday","Brotherhood of Heroes","The Pacific","The Wild Blue","The Longest Day","A Bridge Too Far","D-Day Minute by Minute","Soldier, Sailor, Frogman, Spy, Airman, Gangster, Kill or Die","The Dead and Those About to Die","Omaha Beach","Utah Beach","September Hope","Night Drop","Bastogne: The First Eight Days","Island Victory","The Bridge at Remagen","Follow Me and Die","The Ghost Mountain Boys","Wings of Morning","Hell Hawks!","Black Snow","Ship of Ghosts","The Battle Off Samar","Incredible Victory","Day of Infamy","Lonely Vigil","Savo","Iwo Jima","Given Up for Dead","Pacific Alamo","The Devil's Anvil","Killing Ground on Okinawa","Iwo Jima: Legacy of Valor","Fighter Boys","The Few","Patton's Prayer","Tidal Wave","Brothers Down","Utmost Savagery","The Island","Guadalcanal Diary"];
+let FEEL_BIG, FEEL_CLOSE;
+function feelOf(b){
+  if(!FEEL_BIG){ FEEL_BIG=new Set(FEEL_BIG_T.map(norm)); FEEL_CLOSE=new Set(FEEL_CLOSE_T.map(norm)); }
+  if(b.feel==="close"||b.feel==="big") return b.feel;
+  const t=norm(b.title);
+  if(FEEL_BIG.has(t)) return "big";
+  if(FEEL_CLOSE.has(t)) return "close";
+  if(["memoir","corr","oral","unit","bio"].includes(b.form)) return "close";
+  if(b.form==="ref") return "big";
+  return null;
+}
+const NEW_SINCE = 2021, OLD_BEFORE = 1980;
+
+const THUMB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>';
+const ICON = {
+  up: THUMB,
+  side: THUMB.replace('<svg ', '<svg style="transform:rotate(-90deg)" '),
+  down: THUMB.replace('<svg ', '<svg style="transform:rotate(180deg)" '),
+  unread: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 0 0-9 9v7a2 2 0 0 0 2 2h2v-8H5v-1a7 7 0 0 1 14 0v1h-2v8h2a2 2 0 0 0 2-2v-7a9 9 0 0 0-9-9z"/></svg>',
+  forgot: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>',
+  nobattle: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14.4 6 14 4H5v17h2v-7h5.6l.4 2h7V6z"/><path d="M3 3l18 18" stroke="currentColor" stroke-width="2.4"/></svg>',
+  nope: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 0 1 6.3 12.9L7.1 5.7A8 8 0 0 1 12 4zM4 12c0-1.8.6-3.5 1.7-4.9l11.2 11.2A8 8 0 0 1 4 12z"/></svg>',
+};
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm = s => String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/^(the|a|an) /,"").replace(/[^a-z0-9]+/g," ").trim();
+const slug = s => norm(s).replace(/ /g,"-").slice(0,80);
+const lastName = a => String(a).split("&")[0].trim().split(/\s+/).filter(w=>!/^(jr\.?|sr\.?|ii|iii)$/i.test(w)).pop() || a;
+const idOf = b => slug(b.title + " " + lastName(b.author));
+function lsGet(k,d){ try{ const v=localStorage.getItem("oob:"+k); return v?JSON.parse(v):d; }catch(e){ return d; } }
+function lsSet(k,v){ try{ localStorage.setItem("oob:"+k, JSON.stringify(v)); }catch(e){} }
+
+/* "tonight" matching: a battle or subject he's in the mood for, and things he doesn't want today.
+   This is a mood, not taste, so it never changes what the model has learned. */
+const ORD={"1st":"first","2nd":"second","3rd":"third","4th":"fourth","5th":"fifth","6th":"sixth","7th":"seventh","8th":"eighth","9th":"ninth","10th":"tenth","15th":"fifteenth"};
+const STOP=new Set(["battle","battles","of","the","and","war","ww2","wwii","world","ii","campaign","book","books","about"]);
+function termWords(term){ return norm(term).split(" ").map(w=>ORD[w]||w).filter(w=>w && !STOP.has(w)); }
+function hay(b){ return " "+norm([b.title, (b.tags||[]).join(" ").replace(/-/g," "), THEATER[b.th], BRANCH[b.br], aboutOf(b)].join(" "))+" "; }
+/* A short, plain description of what each book covers. Books Claude found carry their own;
+   for the rest, Claude writes one the first time the book comes up, and it's kept for everyone. */
+function aboutOf(b){ return b.about || state.about[b.id]?.text || ""; }
+async function fetchAbout(books){
+  books=books.filter(b=>!aboutOf(b) && !state.aboutAsked.has(b.id)).slice(0,6);
+  if(!books.length || !state.sample) return;
+  books.forEach(b=>state.aboutAsked.add(b.id));
+  try{
+    const out=await state.sample.json(`For each WWII nonfiction book below, write a factual description of what it covers in one or two plain sentences: the events or battle, the time span, and whose eyes it follows. Do not say who would enjoy it or recommend it. If you don't recognize a book, use an empty string rather than guessing.
+Reply as a JSON object mapping each id to its description.
+${books.map(b=>`${b.id}: "${b.title}" by ${b.author}${b.year?" ("+b.year+")":""}`).join("\n")}`, {modelTier:"default"});
+    for(const b of books){
+      const text=typeof out?.[b.id]==="string" ? out[b.id].trim().slice(0,500) : "";
+      if(!text) continue;
+      state.about[b.id]={text, at:Date.now()};
+      if(state.db){ try{ await state.db.doc("about/"+b.id).set(state.about[b.id]); }catch(e){} }
+    }
+  }catch(e){ /* leave them without a description; the card still works */ }
+  books.forEach(b=>state.aboutDone.add(b.id));
+  if(state.tab==="rate"||state.tab==="next") renderKeepFocus();
+}
+function matches(b, term){ const ws=termWords(term); if(!ws.length) return false; const h=hay(b); return ws.every(w=>h.includes(w)); }
+function tonightOK(b){ return !(state.tonight.avoid||[]).some(a=>matches(b,a)); }
+
+function parseSeed(){
+  const out=[];
+  SEED.trim().split("\n").forEach((line,i)=>{
+    const p=line.split("|"); if(p.length<7) return;
+    const b={title:p[0].trim(), author:p[1].trim(), year:+p[2], th:p[3], br:p[4], form:p[5], tags:p[6].split(",").map(s=>s.trim()).filter(Boolean), rank:i};
+    b.id=idOf(b); out.push(b);
+  });
+  return out;
+}
+const SEED_BOOKS = parseSeed();
+
+const state = {
+  tab: lsGet("tab","rate"),
+  ratings: {},        // id -> {s, reasons, at}
+  notes: null,        // what he's said about his taste, in his words
+  about: {}, aboutAsked:new Set(), aboutDone:new Set(),   // id -> {text}: what each book covers
+  extras: {},         // id -> book found by Claude or imported
+  summary: null,      // Claude's written read on his taste
+  db:null, sample:null, canImages:false, writable:true, connected:false,
+  rateOrder: lsGet("rateOrder","known"), rateView: lsGet("rateView","card"),
+  nextFilter: "all", listFilter:"", listStatus:"all", listKeep:new Set(), skipped:new Set(), sel:0, kbd:false, size:lsGet("size",1),
+  tonight: lsGet("tonight", {topic:"Leyte Gulf", avoid:["8th Air Force"]}), lastAction:null, pendingReason:null,
+};
+
+function allBooks(){
+  const m = new Map(SEED_BOOKS.map(b=>[b.id,b]));
+  Object.values(state.extras).forEach((b,i)=>{ if(b && b.id && !m.has(b.id)) m.set(b.id,{rank:1000+i, tags:[], ...b}); });
+  return [...m.values()];
+}
+const status = id => state.ratings[id]?.s || null;
+
+/* ---------- the learning part ----------
+   Every verdict nudges an affinity score for each feature of that book
+   (theater, branch, kind of book, author, era, subject tags). Scores are
+   shrunk toward zero so one book never becomes a rule. */
+function features(b){
+  const f=[];
+  const fe=feelOf(b); if(fe) f.push("fe:"+fe);
+  if(b.th) f.push("th:"+b.th);
+  if(b.br) f.push("br:"+b.br);
+  if(b.form) f.push("fm:"+b.form);
+  if(b.author) b.author.split("&").forEach(a=>f.push("au:"+a.trim()));
+  if(b.year) f.push("era:"+ERA(b.year));
+  (b.tags||[]).forEach(t=>f.push("tg:"+t));
+  return f;
+}
+function featLabel(f){
+  const [g,v]=[f.slice(0,f.indexOf(":")), f.slice(f.indexOf(":")+1)];
+  if(g==="fe") return FEEL_LABEL[v]||v;
+  if(g==="th") return THEATER[v]||v;
+  if(g==="br") return BRANCH[v]||v;
+  if(g==="fm") return FORM[v]||v;
+  if(g==="tg") return v.replace(/-/g," ");
+  return v;
+}
+let affCache=null;
+function affinity(){
+  if(affCache) return affCache;
+  const books=new Map(allBooks().map(b=>[b.id,b]));
+  const acc={};
+  for(const [id,r] of Object.entries(state.ratings)){
+    if(VAL[r.s]===undefined) continue;
+    const b=books.get(id); if(!b) continue;
+    for(const f of features(b)){
+      const g=f.slice(0,f.indexOf(":"));
+      const v=VAL_BY_GROUP[r.s]?.[g] ?? VAL[r.s];
+      if(v===0) continue;
+      (acc[f] ||= {sum:0,n:0}); acc[f].sum+=v; acc[f].n++;
+    }
+  }
+  const out={};
+  for(const [f,a] of Object.entries(acc)) out[f]={a:a.sum/(a.n+2), n:a.n};
+  return affCache=out;
+}
+function predict(b){
+  const aff=affinity(); let total=0, wsum=0; const contrib=[];
+  const byGroup={};
+  for(const f of features(b)){ const g=f.slice(0,f.indexOf(":")); (byGroup[g] ||= []).push(f); }
+  for(const [g,fs] of Object.entries(byGroup)){
+    const w=GROUP[g].w; let s=0;
+    for(const f of fs){ const a=aff[f]; if(a){ s+=a.a; contrib.push({f, v:a.a*w/fs.length, n:a.n}); } }
+    total+=w*(s/fs.length); wsum+=w;
+  }
+  const score = wsum? total/wsum : 0;           // roughly -1..1
+  contrib.sort((x,y)=>Math.abs(y.v)-Math.abs(x.v));
+  const known = contrib.reduce((n,c)=>n+c.n,0);
+  return {score, pct:Math.round(50+score*100), contrib, known};
+}
+function ratedCount(){ return Object.values(state.ratings).filter(r=>VAL[r.s]!==undefined).length; }
+function bust(){ affCache=null; }
+
+/* ---------- storage: shared db when published, this browser otherwise ---------- */
+async function saveRating(id, rec){
+  if(rec) state.ratings[id]=rec; else delete state.ratings[id];
+  bust();
+  if(state.db){
+    try{ rec ? await state.db.doc("ratings/"+id).set(rec) : await state.db.doc("ratings/"+id).delete(); }
+    catch(e){ toast("Couldn't save that — "+(e.code==="invalid_argument"?"you have view-only access.":"check your connection.")); }
+  } else lsSet("ratings", state.ratings);
+}
+async function saveExtra(b){
+  b=JSON.parse(JSON.stringify(b));   // drop empty fields
+  state.extras[b.id]=b; bust();
+  if(state.db){ try{ await state.db.doc("extra/"+b.id).set(b); }catch(e){} }
+  else lsSet("extras", state.extras);
+}
+async function saveNotes(text){
+  state.notes={text, at:Date.now()};
+  if(state.db){ try{ await state.db.doc("config/notes").set(state.notes); }catch(e){ setStatus("notesStatus","Couldn't save — check your connection."); return; } }
+  else lsSet("notes", state.notes);
+  setStatus("notesStatus","Saved.");
+}
+async function saveSummary(text){
+  state.summary={text, at:Date.now()};
+  if(state.db){ try{ await state.db.doc("config/summary").set(state.summary); }catch(e){} }
+  else lsSet("summary", state.summary);
+}
+
+/* ---------- rendering ---------- */
+function bookMeta(b){
+  return [b.year, THEATER[b.th], BRANCH[b.br], FORM[b.form]].filter(Boolean).join(" · ");
+}
+function whereLinks(b){
+  const q=encodeURIComponent(b.title+" "+lastName(b.author));
+  const qt=encodeURIComponent(b.title);
+  return `<a href="https://www.overdrive.com/search?q=${q}" target="_blank" rel="noopener">Libby</a>
+    <a href="https://www.hoopladigital.com/search?q=${qt}&type=direct" target="_blank" rel="noopener">Hoopla</a>
+    <a href="https://libro.fm/search?q=${q}" target="_blank" rel="noopener">Libro.fm</a>
+    <a href="https://www.chirpbooks.com/search?query=${q}" target="_blank" rel="noopener">Chirp</a>
+    <a href="https://openlibrary.org/search?q=${q}" target="_blank" rel="noopener">Open Library</a>
+    <a href="https://nlsbard.loc.gov/" target="_blank" rel="noopener">BARD</a>`;
+}
+function whyLine(p, max=3){
+  const pos=p.contrib.filter(c=>c.v>0.02).slice(0,max).map(c=>`<span class="pos">+ ${esc(featLabel(c.f))}</span>`);
+  const neg=p.contrib.filter(c=>c.v<-0.02).slice(0,2).map(c=>`<span class="neg">− ${esc(featLabel(c.f))}</span>`);
+  return [...pos,...neg].join(" &nbsp; ") || '<span class="muted">Nothing rated yet that resembles this one.</span>';
+}
+
+function renderTally(){
+  const books=allBooks(); const n=books.length;
+  const sorted=books.filter(b=>status(b.id)).length;
+  const toTry=books.filter(b=>status(b.id)==="unread").length;
+  $("#tally").innerHTML = `${sorted} of ${n} sorted<br>${ratedCount()} verdicts · ${toTry} not yet heard`;
+}
+
+function rateQueue(){
+  let q=allBooks().filter(b=>!status(b.id) && !state.skipped.has(b.id));
+  const o=state.rateOrder;
+  if(o==="known") q.sort((a,b)=>a.rank-b.rank);
+  else if(o==="guess") q.sort((a,b)=>predict(b).score-predict(a).score);
+  else if(o==="new") q.sort((a,b)=>b.year-a.year);
+  else if(o==="old") q.sort((a,b)=>a.year-b.year);
+  return q;
+}
+
+function renderRate(){
+  const el=$("#pane-rate");
+  const q=rateQueue();
+  if(state.rateView==="card") fetchAbout(q.slice(0,4));
+  const orderSeg = `<div class="seg" role="group" aria-label="Order">
+    ${[["known","Best-known first"],["guess","Best guesses"],["new","Newest"],["old","Oldest"]].map(([k,l])=>`<button data-order="${k}" aria-pressed="${state.rateOrder===k}">${l}</button>`).join("")}</div>`;
+  const viewSeg = `<div class="seg" role="group" aria-label="View">
+    ${[["card","One at a time"],["list","Whole list"]].map(([k,l])=>`<button data-view="${k}" aria-pressed="${state.rateView===k}">${l}</button>`).join("")}</div>`;
+  let html = `<p class="muted" style="margin:0 0 12px">Go through the shelf with him. Anything he's already heard or read gets a thumb; anything new to him goes on the to-hear pile. Every answer teaches it a little more about what he likes.</p>
+    <div class="filters">${viewSeg}${state.rateView==="card"?orderSeg:""}</div>`;
+
+  if(state.rateView==="card"){
+    const b=q[0];
+    if(!b && state.skipped.size){
+      html += `<div class="empty">That's everything except the ${state.skipped.size} you skipped. <div style="margin-top:12px"><button class="btn primary" data-unskip>Bring the skipped ones back</button></div></div>`;
+    } else if(!b){
+      html += `<div class="empty">Every book on the shelf is sorted. Head to <b>Find more</b> to bring in titles he hasn't come across, or <b>Up next</b> to see what to play.</div>`;
+    } else {
+      const p=predict(b);
+      const guess = ratedCount()<6 ? "Still learning his taste — the guesses start after a handful of verdicts."
+        : `Best guess: <b>${p.pct>=62?"he'd probably like it":p.pct<=40?"probably not his kind of book":"could go either way"}</b> (${p.pct}%). ${whyLine(p,2)}`;
+      html += `<article class="dossier flip" id="card" data-id="${esc(b.id)}">
+        <div class="serial"><span>File ${String(allBooks().length-q.length+1).padStart(3,"0")} of ${allBooks().length}</span><span>${q.length-1} after this</span></div>
+        <h2><span class="hlt">${esc(b.title)}</span></h2>
+        <div class="by">${esc(b.author)}</div>
+        <div class="chips">
+          <span class="chip">${b.year||"?"}</span>
+          ${feelOf(b)?`<span class="chip">${feelOf(b)==="close"?"Up close":"Big picture"}</span>`:""}
+          ${b.th?`<span class="chip">${esc(THEATER[b.th]||b.th)}</span>`:""}
+          ${b.br?`<span class="chip">${esc(BRANCH[b.br]||b.br)}</span>`:""}
+          ${b.form?`<span class="chip">${esc(FORM[b.form]||b.form)}</span>`:""}
+          ${(b.tags||[]).slice(0,4).map(t=>`<span class="chip">${esc(t.replace(/-/g," "))}</span>`).join("")}
+          ${b.found?`<span class="chip found">Found by Claude</span>`:""}
+        </div>
+        ${aboutOf(b)?`<p class="about">${esc(aboutOf(b))}</p>`:state.sample&&!state.aboutDone.has(b.id)?`<p class="about muted" style="font-style:italic">Getting a short description…</p>`:""}
+        <div class="guess">${guess}</div>
+        <div class="verdicts">
+          ${[["read","He's read it","r4"],["new","He hasn't","r3"]].map(([g,l,c])=>`<div class="vgroup"><div class="lbl">${l}</div><div class="vrow ${c}">
+            ${VERDICTS.map((v,i)=>v.g!==g?"":`<button class="verdict ${v.s}" data-verdict="${v.s}" data-vi="${i}">${ICON[v.s]}<span>${v.label}</span><span class="k">key ${v.key}</span></button>`).join("")}
+          </div></div>`).join("")}
+        </div>
+        <div class="skiprow"><span class="keyhint">Keyboard: <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> pick · <kbd>Enter</kbd> choose · <kbd>S</kbd> skip · <kbd>Backspace</kbd> undo</span>
+          <button class="btn" data-skip>Skip for now</button></div>
+      </article>`;
+    }
+    html += afterBox();
+  } else {
+    html += listView();
+  }
+  el.innerHTML = html;
+}
+
+function afterBox(){
+  const a=state.lastAction; if(!a) return "";
+  const b=allBooks().find(x=>x.id===a.id); if(!b) return "";
+  const r=state.ratings[a.id];
+  const askWhy = r && (r.s==="down"||r.s==="side"||r.s==="nope"||r.s==="forgot");
+  return `<div class="after">Last: <b>${esc(b.title)}</b> <span class="stamp ${r?.s||""}">${STAMP[r?.s]||"Cleared"}</span>
+    &nbsp;<button class="linkbtn" data-undo>Undo</button>
+    ${askWhy?`<div class="lbl" style="margin-top:10px">Why? (optional — helps it learn)</div>
+      <div class="row">${REASONS.map(x=>`<button class="reason" data-reason="${esc(x)}" aria-pressed="${(r.reasons||[]).includes(x)}">${esc(x)}</button>`).join("")}</div>`:""}
+  </div>`;
+}
+
+const SHORT = {up:"Liked", side:"OK", down:"Disliked", forgot:"Forgot", unread:"Not heard", nope:"Not this book", nobattle:"Not this battle"};
+function listView(){
+  const f=norm(state.listFilter), want=state.listStatus;
+  const all=allBooks();
+  const count=k=>all.filter(b=>k==="all"?true:k==="none"?!status(b.id):k==="read"?status(b.id)==="read":status(b.id)===k).length;
+  // a book you just re-answered stays in view until the filter changes, so it doesn't vanish mid-click
+  const books=all.filter(b=>(!f || norm(b.title+" "+b.author).includes(f)) &&
+    (want==="all" || state.listKeep.has(b.id) || (want==="none"?!status(b.id):status(b.id)===want))).sort((a,b)=>a.rank-b.rank);
+  const opts=[["all","All"],["none","Not sorted yet"],...VERDICTS.map(v=>[v.s,SHORT[v.s]]),["read","Marked read from a list"]].filter(([k])=>k==="all"||count(k)>0||k===want);
+  return `<p class="keyhint" style="margin:0 0 10px">Keyboard: <kbd>↑</kbd> <kbd>↓</kbd> move between books · <kbd>1</kbd>–<kbd>7</kbd> answer · <kbd>←</kbd> <kbd>→</kbd> then <kbd>Enter</kbd> also works</p>
+  <div class="lbl">Show</div>
+  <div class="seg statusseg" role="group" aria-label="Show books by answer" style="margin:6px 0 12px">${opts.map(([k,l])=>`<button data-lstatus="${k}" aria-pressed="${want===k}">${l} <span class="mono" style="font-size:13px">${count(k)}</span></button>`).join("")}</div>
+  <div class="filters"><input type="search" id="listq" placeholder="Search title or author" value="${esc(state.listFilter)}" aria-label="Search the shelf"></div>
+  ${books.length?"":`<div class="empty">No books match.</div>`}
+  <div class="list">${books.map(b=>{
+    const s=status(b.id);
+    return `<div class="item" tabindex="0" data-id="${esc(b.id)}"><div><div class="t">${esc(b.title)}</div><div class="m">${esc(b.author)} · ${esc(bookMeta(b))}</div></div>
+      <div class="mini">${VERDICTS.map(v=>`<button data-verdict="${v.s}" aria-pressed="${s===v.s}" title="${v.label}">${ICON[v.s]}<span>${v.label.replace("Haven't heard it","Not heard").replace("Didn't like it","Disliked").replace("Read it, don't remember","Forgot")}</span></button>`).join("")}</div></div>`;
+  }).join("")}</div>`;
+}
+
+function renderNext(){
+  const el=$("#pane-next");
+  const n=ratedCount();
+  const flt=state.nextFilter;
+  const favAuthors=new Set(Object.entries(affinity()).filter(([f,a])=>f.startsWith("au:")&&a.a>0.2).map(([f])=>f.slice(3)));
+  const tn=state.tonight;
+  let pool=allBooks().filter(b=>{ const s=status(b.id); return (flt==="forgot" ? s==="forgot" : (s==="unread"||!s)) && tonightOK(b); });
+  if(tn.topic && termWords(tn.topic).length) pool=pool.filter(b=>matches(b,tn.topic));
+  if(flt==="new") pool=pool.filter(b=>b.year>=NEW_SINCE);
+  if(flt==="old") pool=pool.filter(b=>b.year && b.year<OLD_BEFORE);
+  if(flt==="authors") pool=pool.filter(b=>b.author.split("&").some(a=>favAuthors.has(a.trim())));
+  const scored=pool.map(b=>({b,p:predict(b),s:status(b.id)})).sort((x,y)=>(y.s==="unread")-(x.s==="unread") || y.p.score-x.p.score).slice(0,40);
+  fetchAbout(scored.slice(0,6).map(x=>x.b));
+  const topicList=[...new Set(allBooks().flatMap(b=>b.tags||[]))].sort().map(t=>`<option value="${esc(t.replace(/-/g," "))}">`).join("");
+  el.innerHTML = `<div class="tonight">
+      <div class="lbl">Tonight he's in the mood for</div>
+      <div class="row" style="margin-top:6px"><input type="search" id="topic" list="topics" placeholder="A battle or subject, e.g. Leyte Gulf, Peleliu, submarines" value="${esc(tn.topic||"")}" aria-label="Battle or subject for tonight" style="max-width:420px">
+        <datalist id="topics">${topicList}</datalist>
+        ${tn.topic?'<button class="linkbtn" data-clear-topic>Any battle</button>':""}</div>
+      <div class="lbl" style="margin-top:12px">Not tonight</div>
+      <div class="row" style="margin-top:6px">${(tn.avoid||[]).map((a,i)=>`<span class="chip avoid">${esc(a)} <button class="linkbtn" data-unavoid="${i}" aria-label="Remove ${esc(a)}">×</button></span>`).join("")}
+        <input type="search" id="avoidIn" placeholder="Add something to skip, then Enter" aria-label="Something to skip tonight" style="max-width:280px"></div>
+      <div class="muted" style="font-size:14px;margin-top:8px">These only filter tonight's list. They don't change what it has learned about him.</div>
+    </div>
+    <div class="filters"><div class="seg" role="group" aria-label="Filter">
+      ${[["all","Everything"],["new",`New (${NEW_SINCE}+)`],["old",`Older gems (pre-${OLD_BEFORE})`],["authors","Authors he likes"],["forgot","Re-listens"]].map(([k,l])=>`<button data-next="${k}" aria-pressed="${flt===k}">${l}</button>`).join("")}</div></div>
+    ${n<6?`<div class="notice">Only ${n} verdict${n===1?"":"s"} so far, so this order is mostly guesswork. Sort about 20 books he's heard and it gets much sharper.</div>`:""}
+    ${scored.length?`<div class="list" style="border-top:none">${scored.map(({b,p,s})=>`
+      <div class="rec"><div class="meter">${n<6?"—":p.pct}<small>MATCH</small></div>
+      <div style="min-width:0"><div class="row"><span class="t" style="font-weight:700;font-size:19px">${esc(b.title)}</span>
+        ${s==="unread"?'<span class="badge ok">Confirmed new to him</span>':s==="forgot"?'<span class="badge">Read before, doesn\'t remember</span>':'<span class="badge">Check he hasn\'t heard it</span>'}
+        ${b.found?'<span class="badge">Found by Claude</span>':""}</div>
+        <div class="m muted" style="font-size:15px">${esc(b.author)} · ${esc(bookMeta(b))}</div>
+        ${aboutOf(b)?`<div style="font-size:16px;margin-top:4px">${esc(aboutOf(b))}</div>`:""}
+        <div class="why">${whyLine(p)}</div>
+        <div class="where"><span class="lbl">Look for it:</span>${whereLinks(b)}</div>
+      </div></div>`).join("")}</div>`
+    : `<div class="empty">Nothing unheard on the shelf matches${tn.topic?` “${esc(tn.topic)}”`:" this filter"}.${state.sample&&tn.topic?`<div style="margin-top:12px"><button class="btn primary" data-find-topic>Ask Claude for books on ${esc(tn.topic)}</button></div>`:" Try <b>Find more</b> to bring in more titles."}</div>`}
+    ${scored.length&&state.sample&&tn.topic?`<div class="row" style="margin-top:16px"><button class="btn" data-find-topic>Find more books on ${esc(tn.topic)}</button></div>`:""}
+    <div class="status" id="topicStatus"></div>`;
+}
+
+function renderToHear(){
+  const el=$("#pane-tohear");
+  const pick=s=>allBooks().filter(b=>status(b.id)===s).map(b=>({b,p:predict(b)})).sort((x,y)=>y.p.score-x.p.score);
+  const unread=pick("unread"), forgot=pick("forgot");
+  const li=({b})=>`<li><div class="bt">${esc(b.title)}</div><div class="ba">${esc(b.author)}${b.year?" · "+b.year:""}</div></li>`;
+  el.innerHTML = `<p style="margin:0 0 4px">Books he's marked <b>Haven't heard it</b>, best match first. Use <b>A+</b> at the top to make the print bigger.</p>
+    ${unread.length?`<ol class="biglist">${unread.map(li).join("")}</ol>`:`<div class="empty">Nothing marked “Haven't heard it” yet.</div>`}
+    ${forgot.length?`<h3 style="font-size:24px;margin-top:30px">Read before, doesn't remember</h3><ol class="biglist">${forgot.map(li).join("")}</ol>`:""}`;
+}
+
+function renderAuthors(){
+  const el=$("#pane-authors");
+  const map={};
+  allBooks().forEach(b=>b.author.split("&").forEach(a=>{ a=a.trim(); (map[a] ||= []).push(b); }));
+  const rows=Object.entries(map).map(([a,bs])=>{
+    const ups=bs.filter(b=>status(b.id)==="up").length, downs=bs.filter(b=>status(b.id)==="down").length, sides=bs.filter(b=>status(b.id)==="side").length;
+    const reads=bs.filter(b=>["up","down","side","read","forgot"].includes(status(b.id))).length;
+    const left=bs.filter(b=>!status(b.id)||status(b.id)==="unread");
+    return {a,bs,ups,downs,sides,reads,left,score:ups*2+sides*0.3-downs*2};
+  }).filter(r=>r.reads>0).sort((x,y)=>y.score-x.score||y.reads-x.reads);
+  el.innerHTML = `<p class="muted" style="margin:0 0 8px">Authors he's heard, best-liked first. Ask Claude what else they've written, and anything new lands on the shelf to sort.</p>
+    <div class="status" id="authorStatus"></div>
+    ${rows.length?rows.map(r=>`<div class="author"><div class="row" style="justify-content:space-between">
+      <h3>${esc(r.a)}</h3>
+      <span class="mono" style="font-size:14px">${r.ups} liked · ${r.sides} so-so · ${r.downs} disliked</span></div>
+      ${r.left.length?`<div class="lbl" style="margin-top:6px">On the shelf, not yet heard</div><ul>${r.left.map(b=>`<li>${esc(b.title)} (${b.year})</li>`).join("")}</ul>`:'<div class="muted" style="font-size:15px;margin-top:4px">He\'s heard everything of theirs on the shelf.</div>'}
+      ${state.sample?`<div style="margin-top:8px"><button class="btn" data-more-by="${esc(r.a)}">What else did ${esc(r.a.split(" ").slice(-1)[0])} write?</button></div>`:""}
+    </div>`).join("") : `<div class="empty">No authors yet. Once he gives a thumb to a few books, his authors show up here.</div>`}`;
+}
+
+function renderLearned(){
+  const el=$("#pane-learned");
+  const aff=Object.entries(affinity()).filter(([,a])=>a.n>=1);
+  const groups=Object.keys(GROUP);
+  const n=ratedCount();
+  const reasons={};
+  Object.values(state.ratings).forEach(r=>(r.reasons||[]).forEach(x=>reasons[x]=(reasons[x]||0)+1));
+  const bar=(f,a)=>{ const w=Math.min(100,Math.abs(a.a)*140); const col=a.a>=0?"var(--up)":"var(--down)";
+    return `<div class="bar"><span>${esc(featLabel(f))} <span class="muted mono" style="font-size:12px">×${a.n}</span></span>
+      <span class="track"><span class="fill" style="width:${w}%;background:${col}"></span></span></div>`; };
+  const likes=aff.filter(([,a])=>a.a>0.05).sort((x,y)=>y[1].a-x[1].a).slice(0,12);
+  const dislikes=aff.filter(([,a])=>a.a<-0.05).sort((x,y)=>x[1].a-y[1].a).slice(0,12);
+  el.innerHTML = `
+    ${n<6?`<div class="notice" style="margin-top:0">Only ${n} verdict${n===1?"":"s"} so far. This page fills in as he sorts books.</div>`:""}
+    <div class="grid2">
+      <div><h3 style="font-size:20px">Draws him in</h3>${likes.map(([f,a])=>bar(f,a)).join("")||'<p class="muted">Nothing yet.</p>'}</div>
+      <div><h3 style="font-size:20px">Puts him off</h3>${dislikes.map(([f,a])=>bar(f,a)).join("")||'<p class="muted">Nothing yet.</p>'}</div>
+    </div>
+    ${Object.keys(reasons).length?`<h3 style="font-size:20px;margin-top:26px">Reasons he's given</h3><div class="row" style="margin-top:8px">${Object.entries(reasons).sort((a,b)=>b[1]-a[1]).map(([r,c])=>`<span class="chip">${esc(r)} ×${c}</span>`).join("")}</div>`:""}
+    <h3 style="font-size:20px;margin-top:26px">In his own words</h3>
+    <p class="muted" style="font-size:15px;margin:4px 0 8px">Things he's said about what he likes. Claude reads this every time it looks for books.</p>
+    <textarea id="notesIn" rows="4" placeholder="e.g. Narrative histories feel like watching the news. I want it to feel like an action movie.">${esc(state.notes?.text||"")}</textarea>
+    <div class="row" style="margin-top:8px"><button class="btn" id="saveNotes">Save</button><span class="status" id="notesStatus" style="margin:0"></span></div>
+    <h3 style="font-size:20px;margin-top:26px">In plain words</h3>
+    ${state.summary?`<div class="summary" style="margin-top:8px">${esc(state.summary.text)}</div><div class="lbl" style="margin-top:6px">Written ${new Date(state.summary.at).toLocaleDateString()}</div>`:`<p class="muted">Ask Claude to describe his taste from his verdicts. It also uses this description when hunting for new books.</p>`}
+    ${state.sample?`<div class="row" style="margin-top:10px"><button class="btn primary" id="describe" ${n<5?"disabled":""}>${state.summary?"Rewrite the description":"Describe his taste"}</button>${n<5?'<span class="muted" style="font-size:15px">Needs at least 5 verdicts.</span>':""}</div><div class="status" id="descStatus"></div>`:`<p class="muted" style="font-size:15px">Open the published version on claude.ai to have Claude write this.</p>`}
+  `;
+}
+
+function renderFind(){
+  const el=$("#pane-find");
+  el.innerHTML = `
+    <h3 style="font-size:22px">Ask Claude for books he hasn't found</h3>
+    <p style="margin:6px 0 12px">Claude reads his verdicts, skips every title already on the shelf, and suggests real nonfiction that fits. New finds land on the shelf for him to sort. Double-check anything before buying; Claude can misremember a date or whether an audio edition exists.</p>
+    ${state.sample?`<div class="row">
+      <button class="btn primary" data-find="new">Published ${NEW_SINCE}–now</button>
+      <button class="btn primary" data-find="old">Older books he may have missed</button>
+      <button class="btn" data-find="authors">More from authors he likes</button>
+      <button class="btn" data-find="any">Anything that fits</button>
+    </div><div class="status" id="findStatus"></div>`
+    : `<div class="notice" style="margin-top:0">Finding new books uses Claude, which works in the published version on claude.ai.</div>`}
+
+    <h3 style="font-size:22px;margin-top:34px">Clear out what he's already read</h3>
+    <p style="margin:6px 0 12px">Paste a list of titles — his Audible library, a list typed up from his old paperbacks, anything with one book per line. Matches get marked <span class="stamp read">Already read</span> so they never come up as recommendations. Anything not on the shelf is added and marked read too.</p>
+    <p style="margin:0 0 12px">Found an interesting list somewhere else, like a Goodreads shelf on the Battle of Britain? Copy the whole page, paste it here, and press <b>Add to the shelf to sort</b>. ${state.sample?"Claude picks the book titles out of the clutter":"Each line becomes a book"}, and they show up in “Sort the shelf” for him to go through.</p>
+    <textarea id="paste" rows="6" placeholder="Band of Brothers&#10;With the Old Breed&#10;The Longest Day"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn primary" id="importBtn">Mark these as read</button>
+      <button class="btn" id="addBtn">Add to the shelf to sort</button>
+      <label class="btn" id="photoLbl" ${state.canImages?"":"hidden"} style="display:inline-flex;gap:6px;align-items:center">Photo of his bookshelf<input type="file" id="photo" accept="image/*" multiple hidden></label></div>
+    <div class="status" id="importStatus"></div>
+  `;
+}
+
+function renderListen(){
+  const el=$("#pane-listen");
+  const S=[
+    {top:true, n:"NLS Talking Books (BARD)", c:"Free · Library of Congress", url:"https://www.loc.gov/nls/",
+     p:"If his eyesight makes regular print hard to read, he very likely qualifies. It's free: a mailed player or the BARD Mobile app, and postage-free cartridges. The catalog goes back decades, with lots of WWII memoirs and histories that never got a commercial audiobook. That makes it the best place to find the older books.",
+     how:"Apply through your state's talking-book library. A doctor, eye specialist, or librarian signs the form."},
+    {n:"Libby", c:"Free with a library card", url:"https://libbyapp.com/",
+     p:"Borrow audiobooks from his public library. Add more than one library card for a bigger catalog; some big-city libraries sell non-resident cards for an annual fee.",
+     how:"Popular titles have wait lists; place holds early."},
+    {n:"Hoopla", c:"Free with a participating library", url:"https://www.hoopladigital.com/",
+     p:"Instant borrowing with no wait lists, good for backlist military history. Each library sets a monthly borrow limit.", how:"Check whether his library takes part."},
+    {n:"Chirp", c:"No subscription · pay per book", url:"https://www.chirpbooks.com/",
+     p:"Daily deals, often a few dollars, and older WWII titles show up often. He keeps every book he buys.", how:"Add favorite authors to a wishlist and Chirp emails when they go on sale."},
+    {n:"Libro.fm", c:"Monthly membership with credits", url:"https://libro.fm/",
+     p:"Works like Audible credits, and the money supports an independent bookstore. Files are DRM-free.", how:"Most new releases from major publishers are here."},
+    {n:"Spotify Premium", c:"Included hours each month", url:"https://open.spotify.com/",
+     p:"Premium plans include a monthly allowance of audiobook listening from a large catalog.", how:"Worth it only if the family already pays for Spotify."},
+    {n:"Everand", c:"Subscription", url:"https://www.everand.com/",
+     p:"Formerly Scribd. Has a large audiobook catalog with a monthly limit on unlocks.", how:"Try a free trial against his to-hear list first."},
+    {n:"Read-aloud apps", c:"For books with no audiobook at all", url:"https://openlibrary.org/",
+     p:"For an old title with no audio and no BARD recording, an ebook plus a read-aloud app (Kindle Assistive Reader, Apple Books Speak Screen, Voice Dream and others) will read it to him.", how:"Open Library also lends scans of many out-of-print books."},
+  ];
+  el.innerHTML = `<p style="margin:0 0 16px">He's used up Audible. These are the other places to get the same books, with the free ones first. Each recommendation in <b>Up next</b> has a search link for every one of them.</p>
+    <div class="sources">${S.map(s=>`<div class="src ${s.top?"top":""}">
+      ${s.top?'<div class="lbl" style="color:var(--olive)">Start here</div>':""}
+      <h3>${esc(s.n)}</h3><div class="cost">${esc(s.c)}</div><p>${esc(s.p)}</p><p class="muted" style="font-size:15px">${esc(s.how)}</p>
+      <p><a href="${s.url}" target="_blank" rel="noopener">${esc(s.url.replace(/^https:\/\/(www\.)?/,"").replace(/\/$/,""))}</a></p></div>`).join("")}</div>`;
+}
+
+function render(){
+  $(".wrap").style.zoom = state.size;
+  renderTally();
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected", String(b.dataset.tab===state.tab)));
+  ["rate","next","tohear","authors","learned","find","listen"].forEach(t=>$("#pane-"+t).hidden = t!==state.tab);
+  ({rate:renderRate, next:renderNext, tohear:renderToHear, authors:renderAuthors, learned:renderLearned, find:renderFind, listen:renderListen})[state.tab]();
+  if(state.kbd && state.tab==="rate" && state.rateView==="card"){
+    const btns=document.querySelectorAll("#card .verdict");
+    if(btns.length) btns[Math.min(state.sel,btns.length-1)].focus({preventScroll:false});
+  }
+}
+function renderKeepFocus(){
+  const a=document.activeElement, id=a?.id, pos=a?.selectionStart;
+  render();
+  if(id){ const n=document.getElementById(id); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(e){} } }
+}
+
+let toastT;
+function toast(msg, undo){
+  const t=$("#toast"); t.innerHTML=`<span>${esc(msg)}</span>${undo?'<button data-undo>Undo</button>':""}`; t.hidden=false;
+  clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true, 4000);
+}
+function setStatus(id,msg){ const n=document.getElementById(id); if(n) n.textContent=msg; }
+
+/* ---------- actions ---------- */
+async function verdict(id, s){
+  const prev=state.ratings[id]||null;
+  if(state.rateView==="list" && prev && prev.s===s) await saveRating(id,null);
+  else await saveRating(id, {s, reasons:[], at:Date.now()});
+  state.lastAction={id, prev};
+  render();
+  if(state.rateView==="list") state.listKeep.add(id);
+  if(state.rateView==="list"){ render(); const row=document.querySelector(`.item[data-id="${CSS.escape(id)}"]`); row?.focus({preventScroll:true}); }
+}
+function skip(){
+  const card=$("#card"); if(!card) return;
+  state.skipped.add(card.dataset.id); render();
+}
+async function undo(){
+  const a=state.lastAction; if(!a) return;
+  await saveRating(a.id, a.prev); state.lastAction=null; $("#toast").hidden=true; render();
+}
+async function toggleReason(x){
+  const a=state.lastAction; if(!a) return;
+  const r={...state.ratings[a.id]}; r.reasons=[...(r.reasons||[])];
+  r.reasons = r.reasons.includes(x) ? r.reasons.filter(y=>y!==x) : [...r.reasons, x];
+  await saveRating(a.id, r); render();
+}
+
+function tasteBrief(){
+  const books=new Map(allBooks().map(b=>[b.id,b]));
+  const lines={up:[],side:[],down:[],nope:[],nobattle:[],read:[],forgot:[]};
+  for(const [id,r] of Object.entries(state.ratings)){
+    const b=books.get(id); if(!b || !lines[r.s]) continue;
+    lines[r.s].push(`${b.title} — ${b.author} (${b.year||"?"})${r.reasons?.length?" [why: "+r.reasons.join("; ")+"]":""}`);
+  }
+  const aff=Object.entries(affinity()).filter(([,a])=>a.n>=2);
+  const top=aff.sort((x,y)=>y[1].a-x[1].a).slice(0,10).map(([f])=>featLabel(f));
+  const bottom=aff.sort((x,y)=>x[1].a-y[1].a).slice(0,8).filter(([,a])=>a.a<0).map(([f])=>featLabel(f));
+  return `LISTENER: a retired man who listens to WWII audiobooks. Nonfiction only (no novels, no sci-fi, no alternate history). Mostly battle-focused memoirs and histories of the Pacific or European theaters with American involvement.
+LIKED: ${lines.up.join(" | ")||"none yet"}
+SO-SO: ${lines.side.join(" | ")||"none"}
+DISLIKED: ${lines.down.join(" | ")||"none"}
+NOT INTERESTED IN THIS PARTICULAR BOOK: ${lines.nope.join(" | ")||"none"}
+NOT INTERESTED IN THAT BATTLE OR SUBJECT AT ALL: ${lines.nobattle.join(" | ")||"none"}
+READ BUT REMEMBERS NOTHING: ${lines.forgot.join(" | ")||"none"}
+LEARNED PULLS: ${top.join(", ")||"unknown"}
+LEARNED PUSHES: ${bottom.join(", ")||"unknown"}
+${state.notes?.text?"IN HIS OWN WORDS (weigh this heavily): "+state.notes.text:""}
+${state.summary?"TASTE SUMMARY: "+state.summary.text:""}`;
+}
+
+async function describe(){
+  const btn=$("#describe"); if(btn) btn.disabled=true;
+  setStatus("descStatus","Claude is reading his verdicts…");
+  try{
+    const res=await state.sample(`${tasteBrief()}
+
+Write a short, plain-English profile of this listener's taste in WWII books for his family: 4–6 sentences. Be specific about the patterns you can see (theater, branch, memoir vs. history, ground-level vs. generals, era written, length, anything quirky), and say what to avoid. Only claim patterns the verdicts support. No headings, no bullet points.`, {modelTier:"default", cache:false});
+    await saveSummary(res.text.trim());
+    render();
+  }catch(e){
+    setStatus("descStatus", e.code==="not_granted"?"Claude access wasn't allowed for this page.":"Couldn't get a description — try again in a minute.");
+    if(btn) btn.disabled=false;
+  }
+}
+
+async function findBooks(mode, author){
+  const topic = mode==="topic" ? state.tonight.topic : null;
+  const statusId = author?"authorStatus":topic?"topicStatus":"findStatus";
+  document.querySelectorAll("[data-find],[data-more-by],[data-find-topic]").forEach(b=>b.disabled=true);
+  setStatus(statusId, author?`Asking Claude about ${author}…`:"Claude is searching its memory of the WWII shelf…");
+  const known=allBooks().map(b=>`${b.title} (${lastName(b.author)})`).join("; ");
+  const favAuthors=Object.entries(affinity()).filter(([f,a])=>f.startsWith("au:")&&a.a>0.15).map(([f])=>f.slice(3));
+  const avoidTxt = (state.tonight.avoid||[]).length ? ` Tonight he does NOT want anything about: ${state.tonight.avoid.join(", ")}.` : "";
+  const ask = topic ? `He wants books specifically about: ${topic}. Suggest up to 10 real nonfiction books focused on that battle or subject, from any era, including older or lesser-known ones and the definitive accounts.${avoidTxt}`
+    : author ? `List other WWII nonfiction books written by ${author} that are not in the KNOWN list. Include all of them you are confident exist, up to 10.`
+    : mode==="new" ? `Suggest 10 real WWII nonfiction books first published ${NEW_SINCE} or later (through ${new Date().getFullYear()}) that fit him.`
+    : mode==="old" ? `Suggest 10 real WWII nonfiction books published before ${OLD_BEFORE} that fit him and that a lifelong reader could easily have missed: out-of-print memoirs, wartime correspondent books, early unit histories. Prefer ones that are likely available as recordings from the Library of Congress talking-book program (NLS/BARD) or as commercial audiobooks.`
+    : mode==="authors" ? `Suggest up to 10 real WWII nonfiction books by authors he has liked (${favAuthors.join(", ")||"see LIKED"}) that are not in the KNOWN list. If those authors have no more such books, suggest books by authors with a very similar style.`
+    : `Suggest 10 real WWII nonfiction books that best fit him.`;
+  const prompt = `${tasteBrief()}
+
+KNOWN (never suggest these, under any edition or subtitle): ${known}
+
+TASK: ${ask}
+Rules: nonfiction only; real books you are confident exist with correct author and first-publication year; no books in KNOWN; favor American involvement in battles unless his verdicts say otherwise. Fewer is fine if you're not confident.
+Reply as a JSON array of objects with keys:
+"title", "author", "year" (number), "theater" (one of E=NW Europe, B=Battle of Britain/Blitz, M=North Africa/Sicily/Italy, A=air war over Europe, P=Pacific, C=China-Burma-India, T=Atlantic, G=whole war),
+"branch" (one of army, abn, ranger, armor, usmc, navy, sub, aaf, raf, multi, brit), "form" (one of memoir, history, oral, bio, unit, corr, ref),
+"tags" (2–5 short lowercase-hyphenated subjects like "iwo-jima", "b-17", "small-unit"),
+"feel" ("close" if it follows a few people through the fighting and reads like an action movie, "big" if it is a sweeping overview that reads more like the news),
+"about" (one or two plain sentences on what the book covers: events, time span, whose eyes it follows; do not mention the listener), "why" (one short sentence on why it fits him), "audio" (one of "audiobook", "BARD likely", "unknown").`;
+  try{
+    const arr=await state.sample.json(prompt,{modelTier:"complex", cache:false});
+    const knownIds=new Set(allBooks().map(b=>b.id));
+    const knownTitles=new Set(allBooks().map(b=>norm(b.title)));
+    let added=0;
+    for(const x of (Array.isArray(arr)?arr:[])){
+      if(!x||!x.title||!x.author) continue;
+      const b={title:String(x.title).slice(0,200), author:String(x.author).slice(0,120), year:+x.year||null,
+        th:THEATER[x.theater]?x.theater:"G", br:BRANCH[x.branch]?x.branch:"multi", form:FORM[x.form]?x.form:"history",
+        tags:(Array.isArray(x.tags)?x.tags:[]).map(t=>slug(String(t))).filter(Boolean).slice(0,5),
+        about:String(x.about||"").slice(0,500), why:String(x.why||"").slice(0,300), audio:x.audio&&x.audio!=="unknown"?String(x.audio).slice(0,40):undefined,
+        feel:x.feel==="close"||x.feel==="big"?x.feel:undefined,
+        found:true, foundAt:Date.now()};
+      b.id=idOf(b);
+      if(knownIds.has(b.id)||knownTitles.has(norm(b.title))) continue;
+      knownIds.add(b.id); knownTitles.add(norm(b.title));
+      await saveExtra(b); added++;
+    }
+    if(!topic){ state.rateOrder = mode==="new"?"new":mode==="old"?"old":"guess"; lsSet("rateOrder",state.rateOrder); }
+    render();
+    setStatus(statusId, added?(topic?`Added ${added} book${added===1?"":"s"} on ${topic}. They're listed above with a “check he hasn't heard it” tag.`:`Added ${added} book${added===1?"":"s"} to the shelf. Go to “Sort the shelf” to go through them.`):"Claude didn't come up with anything new this time.");
+  }catch(e){
+    render();
+    setStatus(statusId, e.code==="not_granted"?"Claude access wasn't allowed for this page.":e.code==="rate_limited"?"Too many requests — wait a minute and try again.":"That search didn't work — try again.");
+  }
+}
+
+async function markRead(titles){
+  const books=allBooks();
+  const byTitle=new Map(books.map(b=>[norm(b.title),b]));
+  let matched=0, added=0;
+  for(const raw of titles){
+    const [tRaw,aRaw]=raw.split(/\s+(?:by|—|-)\s+/i);
+    const t=norm(tRaw); if(!t) continue;
+    let b=byTitle.get(t) || books.find(x=>{ const n=norm(x.title); return n.length>6 && (n.startsWith(t)||t.startsWith(n)); });
+    if(!b){
+      b={title:tRaw.trim().slice(0,200), author:(aRaw||"Unknown").trim().slice(0,120), year:null, tags:[], imported:true};
+      b.id=idOf(b); await saveExtra(b); byTitle.set(t,b); added++;
+    } else matched++;
+    const s=status(b.id);
+    if(!s || s==="unread") await saveRating(b.id,{s:"read", reasons:[], at:Date.now()});
+  }
+  render();
+  return {matched, added};
+}
+
+async function addToShelf(){
+  const text=$("#paste").value.trim();
+  if(!text){ setStatus("importStatus","Paste a list first."); return; }
+  const known=new Set(allBooks().map(b=>norm(b.title)));
+  let items=[];
+  if(state.sample){
+    setStatus("importStatus","Claude is picking out the books…");
+    try{
+      const arr=await state.sample.json(`The text below was pasted from a web page or list of WWII books. Extract each distinct nonfiction book (skip novels, ratings, user names, menus and other clutter). Reply as a JSON array of objects with keys "title" (without series or subtitle clutter), "author", "year" (first publication, number or null), "theater" (one of E=NW Europe, B=Battle of Britain/Blitz, M=North Africa/Sicily/Italy, A=air war over Europe, P=Pacific, C=China-Burma-India, T=Atlantic, G=whole war), "branch" (one of army, abn, ranger, armor, usmc, navy, sub, aaf, raf, multi, brit), "form" (one of memoir, history, oral, bio, unit, corr, ref), "tags" (2–4 short lowercase-hyphenated subjects), "feel" ("close" if it follows a few people through the fighting like an action movie, "big" if it is a sweeping overview).
+
+PASTED TEXT:
+${text.slice(0,30000)}`, {modelTier:"default", cache:false});
+      items=Array.isArray(arr)?arr:[];
+    }catch(e){ setStatus("importStatus","Claude couldn't read that list — falling back to one title per line."); }
+  }
+  if(!items.length) items=text.split("\n").map(l=>l.trim()).filter(Boolean).map(l=>{ const [t,a]=l.split(/\s+(?:by|—|-)\s+/i); return {title:t, author:a||"Unknown"}; });
+  let added=0, dup=0;
+  for(const x of items){
+    if(!x||!x.title) continue;
+    if(known.has(norm(x.title))){ dup++; continue; }
+    const b={title:String(x.title).slice(0,200), author:String(x.author||"Unknown").slice(0,120), year:+x.year||null,
+      th:THEATER[x.theater]?x.theater:undefined, br:BRANCH[x.branch]?x.branch:undefined, form:FORM[x.form]?x.form:undefined,
+      tags:(Array.isArray(x.tags)?x.tags:[]).map(t=>slug(String(t))).filter(Boolean).slice(0,4), feel:x.feel==="close"||x.feel==="big"?x.feel:undefined, pasted:true};
+    b.id=idOf(b); known.add(norm(b.title)); await saveExtra(b); added++;
+  }
+  render();
+  setStatus("importStatus",`Added ${added} book${added===1?"":"s"} to the shelf${dup?` (${dup} were already there)`:""}. They're waiting in “Sort the shelf”.`);
+}
+
+async function readPhotos(files){
+  setStatus("importStatus","Claude is reading the spines…");
+  try{
+    const arr=await state.sample.json(`These photos show a bookshelf belonging to a WWII reader. List every book whose title you can read on a spine or cover. Reply as a JSON array of objects: {"title": string, "author": string or ""}. Skip anything you can't read clearly.`, {images:files, modelTier:"default", cache:false});
+    const lines=(Array.isArray(arr)?arr:[]).filter(x=>x&&x.title).map(x=>x.author?`${x.title} by ${x.author}`:x.title);
+    if(!lines.length){ setStatus("importStatus","Couldn't make out any titles. Try a closer, well-lit photo."); return; }
+    $("#paste").value=lines.join("\n");
+    setStatus("importStatus",`Found ${lines.length} titles. Check the list, fix anything misread, then press “Mark these as read”.`);
+  }catch(e){ setStatus("importStatus","Couldn't read that photo — try another."); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", async e=>{
+  const t=e.target.closest("button,[data-tab]"); if(!t) return;
+  if(t.dataset.tab){ state.tab=t.dataset.tab; lsSet("tab",state.tab); render(); return; }
+  if(t.dataset.vi!==undefined) state.sel=+t.dataset.vi;
+  if(t.dataset.verdict){ const host=t.closest("[data-id]"); if(host) verdict(host.dataset.id, t.dataset.verdict); return; }
+  if(t.hasAttribute("data-undo")) return undo();
+  if(t.hasAttribute("data-skip")) return skip();
+  if(t.hasAttribute("data-unskip")){ state.skipped.clear(); render(); return; }
+  if(t.dataset.size){ state.size=Math.max(1, Math.min(1.6, +(state.size + 0.15*t.dataset.size).toFixed(2))); lsSet("size",state.size); render(); return; }
+  if(t.dataset.reason) return toggleReason(t.dataset.reason);
+  if(t.dataset.order){ state.rateOrder=t.dataset.order; lsSet("rateOrder",state.rateOrder); render(); return; }
+  if(t.dataset.lstatus){ state.listStatus=t.dataset.lstatus; state.listKeep.clear(); render(); return; }
+  if(t.dataset.view){ state.rateView=t.dataset.view; lsSet("rateView",state.rateView); render(); return; }
+  if(t.dataset.next){ state.nextFilter=t.dataset.next; render(); return; }
+  if(t.dataset.find) return findBooks(t.dataset.find);
+  if(t.hasAttribute("data-find-topic")) return findBooks("topic");
+  if(t.hasAttribute("data-clear-topic")){ state.tonight={...state.tonight, topic:""}; lsSet("tonight",state.tonight); render(); return; }
+  if(t.dataset.unavoid!==undefined){ const a=[...state.tonight.avoid]; a.splice(+t.dataset.unavoid,1); state.tonight={...state.tonight, avoid:a}; lsSet("tonight",state.tonight); render(); return; }
+  if(t.id==="addBtn") return addToShelf();
+  if(t.dataset.moreBy) return findBooks("author", t.dataset.moreBy);
+  if(t.id==="describe") return describe();
+  if(t.id==="saveNotes") return saveNotes($("#notesIn").value.trim());
+  if(t.id==="importBtn"){
+    const lines=$("#paste").value.split("\n").map(s=>s.trim()).filter(Boolean);
+    if(!lines.length){ setStatus("importStatus","Paste at least one title first."); return; }
+    const {matched,added}=await markRead(lines);
+    state.tab="find"; render();
+    setStatus("importStatus",`Marked ${matched+added} as read: ${matched} matched the shelf, ${added} added.`);
+  }
+});
+document.addEventListener("input", e=>{
+  if(e.target.id==="listq"){ state.listFilter=e.target.value; state.listKeep.clear(); renderKeepFocus(); }
+  if(e.target.id==="topic"){ state.tonight={...state.tonight, topic:e.target.value}; lsSet("tonight",state.tonight); clearTimeout(topicT); topicT=setTimeout(renderKeepFocus,250); }
+});
+let topicT;
+document.addEventListener("change", e=>{
+  if(e.target.id==="photo" && e.target.files?.length) readPhotos(e.target.files);
+});
+document.addEventListener("keydown", e=>{
+  if(e.target.id==="avoidIn" && e.key==="Enter" && e.target.value.trim()){
+    state.tonight={...state.tonight, avoid:[...(state.tonight.avoid||[]), e.target.value.trim()]}; lsSet("tonight",state.tonight); render(); $("#avoidIn")?.focus(); return;
+  }
+  if(/input|textarea|select/i.test(e.target.tagName)) return;
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  const k=e.key;
+  // tabs: arrows move between them
+  if(e.target.matches?.("#tabs button") && (k==="ArrowLeft"||k==="ArrowRight")){
+    const tabs=[...document.querySelectorAll("#tabs button")]; let i=tabs.indexOf(e.target)+(k==="ArrowRight"?1:-1);
+    i=(i+tabs.length)%tabs.length; state.tab=tabs[i].dataset.tab; lsSet("tab",state.tab); render(); document.querySelector(`#tabs [data-tab="${state.tab}"]`).focus(); e.preventDefault(); return;
+  }
+  if(state.tab!=="rate") return;
+
+  if(state.rateView==="card"){
+    const card=$("#card");
+    const v=VERDICTS.find(v=>v.key===k);
+    if(v && card){ e.preventDefault(); state.kbd=true; state.sel=VERDICTS.indexOf(v); verdict(card.dataset.id, v.s); return; }
+    if(k==="Backspace"||k==="u"||k==="z"){ if(state.lastAction){ e.preventDefault(); state.kbd=true; undo(); } return; }
+    if(k==="s"||k==="S"){ e.preventDefault(); state.kbd=true; skip(); return; }
+    if(!card) return;
+    const btns=[...card.querySelectorAll(".verdict")];
+    const skipBtn=card.querySelector("[data-skip]");
+    if(document.activeElement===skipBtn){
+      if(k==="ArrowUp"){ e.preventDefault(); state.kbd=true; state.sel=state.sel>=4?state.sel:4; btns[state.sel].focus(); }
+      return;   // Enter/Space on Skip works on its own
+    }
+    if(["ArrowRight","ArrowLeft","ArrowDown","ArrowUp"].includes(k)){
+      e.preventDefault(); state.kbd=true;
+      const cur=btns.indexOf(document.activeElement);
+      if(k==="ArrowDown" && cur>=4){ skipBtn?.focus(); return; }   // bottom row → Skip for now
+      let i;
+      if(cur<0) i=state.sel;
+      else if(k==="ArrowRight") i=(cur+1)%btns.length;
+      else if(k==="ArrowLeft") i=(cur-1+btns.length)%btns.length;
+      else if(k==="ArrowDown") i= cur<4 ? 4+Math.min(cur,2) : cur;    // "read it" row → "hasn't" row
+      else i= cur>=4 ? cur-4 : cur;
+      state.sel=i; btns[i].focus();
+      return;
+    }
+    if((k==="Enter"||k===" ") && !btns.includes(document.activeElement)){ e.preventDefault(); state.kbd=true; btns[state.sel]?.click(); }
+    return;
+  }
+
+  // whole-list view: up/down between books, left/right between answers, 1-6 answers
+  const row=e.target.closest?.(".item");
+  const rows=[...document.querySelectorAll("#pane-rate .item")];
+  if(k==="ArrowDown"||k==="ArrowUp"){
+    e.preventDefault();
+    let i=row?rows.indexOf(row)+(k==="ArrowDown"?1:-1):0; i=Math.max(0,Math.min(rows.length-1,i));
+    const bi=row?[...row.querySelectorAll(".mini button")].indexOf(e.target):-1;
+    const target=rows[i]; if(!target) return;
+    (bi>=0?target.querySelectorAll(".mini button")[bi]:target).focus(); target.scrollIntoView({block:"nearest"});
+    return;
+  }
+  if(!row) return;
+  const btns=[...row.querySelectorAll(".mini button")];
+  if(k==="ArrowRight"||k==="ArrowLeft"){
+    e.preventDefault(); const cur=btns.indexOf(e.target);
+    let i=cur<0?0:cur+(k==="ArrowRight"?1:-1); i=(i+btns.length)%btns.length; btns[i].focus(); return;
+  }
+  const v=VERDICTS.find(v=>v.key===k);
+  if(v){ e.preventDefault(); verdict(row.dataset.id, v.s); }
+});
+
+/* ---------- boot ---------- */
+state.ratings=lsGet("ratings",{}); state.extras=lsGet("extras",{}); state.summary=lsGet("summary",null); state.notes=lsGet("notes",null);
+render();
+
+(async function connect(){
+  let rt = typeof claude!=="undefined" ? claude : null;
+  if(!rt){
+    const n=$("#notice"); n.hidden=false;
+    n.textContent="Running as a plain file: verdicts are saved in this browser only, and Claude's book-finding is off. Open the published link on claude.ai to share one list with the family.";
+    return;
+  }
+  try{
+    const user=await rt.use("user");
+    if(user && (await user.can("data.write"))===false){ state.writable=false; const n=$("#notice"); n.hidden=false; n.textContent="You have view-only access: you can browse, but verdicts won't be saved."; }
+  }catch(e){}
+  try{ state.sample=await rt.use("sample"); }catch(e){}
+  if(state.sample){ try{ const lim=await state.sample.limits(); state.canImages=!!lim?.images; }catch(e){} }
+  let db=null; try{ db=await rt.use("db"); }catch(e){}
+  if(!db){ const n=$("#notice"); n.hidden=false; n.textContent="Not connected to the shared list. Verdicts are saved in this browser only."; render(); return; }
+  state.db=db; state.connected=true;
+  db.collection("ratings").onSnapshot(s=>{ const r={}; s.docs.forEach(d=>r[d.id]=d.data()); state.ratings=r; bust(); renderKeepFocus(); }, ()=>{});
+  db.collection("about").onSnapshot(s=>{ const a={}; s.docs.forEach(d=>a[d.id]=d.data()); state.about=a; if(state.tab==="rate"||state.tab==="next") renderKeepFocus(); }, ()=>{});
+  db.collection("extra").onSnapshot(s=>{ const x={}; s.docs.forEach(d=>x[d.id]=d.data()); state.extras=x; bust(); renderKeepFocus(); }, ()=>{});
+  db.doc("config/notes").onSnapshot(s=>{ state.notes=s.data()||null; if(state.tab==="learned" && document.activeElement?.id!=="notesIn") render(); }, ()=>{});
+  db.doc("config/summary").onSnapshot(s=>{ state.summary=s.data()||null; if(state.tab==="learned") render(); }, ()=>{});
+  render();
+})();
+</script>
