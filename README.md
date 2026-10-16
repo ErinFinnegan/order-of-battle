@@ -85,4 +85,4 @@ Books Claude finds or you paste go into the shared store, not the file.
 | `config/notes` | `{text, at}`: his taste in his own words |
 | `config/summary` | `{text, at}`: a plain-English description of his taste |
 
-See [TO-HEAR.md](TO-HEAR.md) for his current to-hear list with audiobook links.
+His current to-hear list, in large print for a phone: https://erinfinnegan.github.io/order-of-battle/to-hear.html (source: `to-hear.html`; the same list as a table is in [TO-HEAR.md](TO-HEAR.md)).
