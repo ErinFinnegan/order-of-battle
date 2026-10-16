@@ -6,6 +6,8 @@ Audible. Built for a listener with weak eyes: big type, a text-size control, a b
 yellow highlight, and full arrow-key control so he never needs the touchpad. On a phone
 the answer buttons stay pinned to the bottom of the screen.
 
+What we've learned about his taste, in plain English: [TASTES.md](TASTES.md).
+
 ## Running it
 
 Open `index.html` in a browser. Run `node build.js` after editing `src/artifact.html`;
