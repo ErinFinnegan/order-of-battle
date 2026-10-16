@@ -20,8 +20,10 @@ artifact has both.
 A simpler version for Dad's Android phone: one book at a time with a large description,
 and four big buttons: **Good Book**, **Read, Don't Remember**, **Pass**, and **Save /
 Haven't Heard**. No tags or scores on screen. A **Saved** tab lists what he wants to hear,
-led by confirmed audiobooks with a **Get it on Audible** button, then BARD; library
-apps (Libby) come last, since they depend on a working library card. Books with a
+led by confirmed audiobooks with a **Get it on Audible** button. **More places to listen**
+folds out Chirp, Everand, Spotify, Audiobooks.com, BARD, the Internet Archive, LibriVox
+(older books) and, last, Libby, since it depends on a working library card. The tab also
+links BBC Sounds and CBC Listen for WWII documentaries. Books with a
 confirmed Audible edition always rank ahead of books without one, and each card says
 which it is. Audiobook status lives in `phone/curation.json` under `audio`.
 

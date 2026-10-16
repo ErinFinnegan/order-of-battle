@@ -63,8 +63,13 @@ Fortresses*).
 
 ## How he listens
 
-- **Audible first.** He still has it, and it's the most reliable way for him to get a
-  book. Favor books with a confirmed audiobook.
+- **Audible preferred, not required.** He still has it, and it's the most reliable way
+  for him to get a book, so favor books with a confirmed Audible edition. A book that
+  isn't on Audible can still be found elsewhere: Chirp (cheap sales, no subscription),
+  Everand, Spotify, Audiobooks.com (a different catalog from Audible), LibriVox and the
+  Internet Archive (older and out-of-print recordings).
+- **Radio and documentaries count too.** BBC Sounds and CBC Listen have WWII
+  documentaries and oral histories for a shorter evening.
 - **Library apps (Libby, Hoopla) have been frustrating** because they depend on having
   a library card set up. Offer them last.
 - **BARD** (free Library of Congress Talking Books) is the best bet for older books

@@ -667,8 +667,12 @@ function whereLinks(b){
   const qt=encodeURIComponent(b.title);
   return `<a href="https://www.audible.com/search?keywords=${q}" target="_blank" rel="noopener"><b>Audible</b></a>
     <a href="https://www.chirpbooks.com/search?query=${q}" target="_blank" rel="noopener">Chirp</a>
+    <a href="https://www.everand.com/search?query=${q}" target="_blank" rel="noopener">Everand</a>
+    <a href="https://open.spotify.com/search/${q}/audiobooks" target="_blank" rel="noopener">Spotify</a>
+    <a href="https://www.audiobooks.com/search/book/${q}" target="_blank" rel="noopener">Audiobooks.com</a>
     <a href="https://libro.fm/search?q=${q}" target="_blank" rel="noopener">Libro.fm</a>
     <a href="https://nlsbard.loc.gov/" target="_blank" rel="noopener">BARD</a>
+    <a href="https://archive.org/search?query=${qt}&and%5B%5D=mediatype%3A%22audio%22" target="_blank" rel="noopener">Internet Archive</a>
     <a href="https://www.overdrive.com/search?q=${q}" target="_blank" rel="noopener">Libby</a>
     <a href="https://www.hoopladigital.com/search?q=${qt}&type=direct" target="_blank" rel="noopener">Hoopla</a>`;
 }
@@ -927,7 +931,17 @@ function renderListen(){
     {n:"Spotify Premium", c:"Included hours each month", url:"https://open.spotify.com/",
      p:"Premium plans include a monthly allowance of audiobook listening from a large catalog.", how:"Worth it only if the family already pays for Spotify."},
     {n:"Everand", c:"Subscription", url:"https://www.everand.com/",
-     p:"Formerly Scribd. Has a large audiobook catalog with a monthly limit on unlocks.", how:"Try a free trial against his to-hear list first."},
+     p:"Formerly Scribd, and the biggest overlooked alternative to Audible. Lots of military history and memoirs, and its recommendations sometimes turn up deeper cuts than Audible's.", how:"Try a free trial against his to-hear list first."},
+    {n:"Audiobooks.com", c:"Subscription", url:"https://www.audiobooks.com/",
+     p:"Licenses a different catalog than Audible, so a book missing from Audible is sometimes here.", how:"Check here when a book shows as not on Audible."},
+    {n:"LibriVox", c:"Free · volunteer readers", url:"https://librivox.org/",
+     p:"Public-domain audiobooks read by volunteers. Quality varies a lot, but older memoirs and firsthand accounts whose copyright has lapsed can be gems.", how:"Most useful for books from the 1940s and 1950s."},
+    {n:"Internet Archive", c:"Free", url:"https://archive.org/details/audio_bookspoetry",
+     p:"A deep archive of old cassette transfers, radio documentaries, memoirs, oral histories and out-of-print recordings.", how:"Search by title; some recordings can be borrowed rather than downloaded."},
+    {n:"BBC Sounds", c:"Free · radio and documentaries", url:"https://www.bbc.co.uk/sounds/search?q=second%20world%20war",
+     p:"Not books, but excellent WWII listening: documentaries, oral histories, dramatizations and serialized nonfiction.", how:"Some programs may be limited outside the UK."},
+    {n:"CBC Listen", c:"Free · radio and documentaries", url:"https://www.cbc.ca/listen/search?q=second%20world%20war",
+     p:"Canadian WWII documentaries and history series, usually calmer and less sensational than American military podcasts.", how:"Good for an evening when he wants something shorter than a book."},
     {n:"Read-aloud apps", c:"For books with no audiobook at all", url:"https://openlibrary.org/",
      p:"For an old title with no audio and no BARD recording, an ebook plus a read-aloud app (Kindle Assistive Reader, Apple Books Speak Screen, Voice Dream and others) will read it to him.", how:"Open Library also lends scans of many out-of-print books."},
   ];

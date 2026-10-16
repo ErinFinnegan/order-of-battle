@@ -1,6 +1,6 @@
 // Keeps the app working offline. Serves the cached copy right away and refreshes it in
 // the background, so a new book list shows up the next time he opens the app.
-const CACHE = "oob-phone-v2";
+const CACHE = "oob-phone-v3";
 const FILES = ["./", "index.html", "data.js", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", e => {

@@ -73,6 +73,12 @@ header h1{font-family:var(--display); font-size:26px; margin:0; letter-spacing:.
 .links a{display:inline-flex; align-items:center; min-height:50px; padding:10px 16px; border-radius:8px; background:var(--olive); color:var(--olive-ink); text-decoration:none; font-weight:700; font-size:19px}
 .links a.alt{background:transparent; color:var(--ink); border:2px solid var(--ink)}
 .links a.lib{background:transparent; color:var(--muted); min-height:50px; padding:10px 6px; text-decoration:underline; font-weight:400; font-size:17px}
+.more{margin-top:12px}
+.more summary{font-size:19px; font-weight:700; cursor:pointer; padding:10px 0; min-height:48px; list-style-position:inside}
+.morelinks{display:flex; flex-direction:column; gap:8px}
+.morelinks a{display:flex; align-items:center; min-height:50px; padding:10px 14px; border-radius:8px; border:2px solid var(--line); color:var(--ink); text-decoration:none; font-size:19px}
+.morelinks a:focus-visible, .more summary:focus-visible{outline:4px solid var(--hl); outline-offset:2px}
+.radio{margin-top:28px}
 .send{margin-top:28px; padding:18px; border:2px dashed var(--line); border-radius:10px}
 .send button{width:100%; min-height:64px; border-radius:10px; border:none; background:var(--olive); color:var(--olive-ink); font-size:21px; font-weight:700; cursor:pointer}
 .send textarea{width:100%; margin-top:12px; font-size:14px; padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--ink)}
@@ -211,9 +217,25 @@ const HEADPHONES='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="curren
 function audioLine(b){
   return b.audio==="yes"
     ? `<div class="audio yes">${HEADPHONES}<span>Audiobook on Audible${b.audioNote?` · ${esc(b.audioNote)}`:""}</span></div>`
-    : `<div class="audio no">No audiobook found</div>`;
+    : `<div class="audio no">Not on Audible</div>`;
 }
 const audibleUrl = b => b.audible || `https://www.audible.com/search?keywords=${q(b.title+" "+lastName(b.author))}`;
+// Other places that sell or lend audiobooks. Audible stays first; these are the backups.
+function otherSources(b){
+  const t=q(b.title+" "+lastName(b.author));
+  const list=[
+    ["Chirp (sales, no subscription)", `https://www.chirpbooks.com/search?query=${t}`],
+    ["Everand", `https://www.everand.com/search?query=${t}`],
+    ["Spotify", `https://open.spotify.com/search/${t}/audiobooks`],
+    ["Audiobooks.com", `https://www.audiobooks.com/search/book/${t}`],
+    ["BARD (free Talking Books)", "https://nlsbard.loc.gov/"],
+    ["Internet Archive", `https://archive.org/search?query=${q(b.title)}&and%5B%5D=mediatype%3A%22audio%22`],
+  ];
+  // Books from before 1964 whose copyright lapsed can turn up free on LibriVox.
+  if(b.year && b.year<1964) list.push(["LibriVox (free, volunteer readers)", `https://librivox.org/search?q=${q(b.title)}&search_form=advanced`]);
+  list.push(["Library (Libby)", `https://www.overdrive.com/search?q=${t}`]);
+  return list;
+}
 function undoHtml(){
   if(!last) return `<div class="below"></div>`;
   const b=D.shelf.find(x=>x.id===last.id);
@@ -225,19 +247,29 @@ function renderSaved(){
   const pending=Object.values(answers).filter(a=>a.at>sentAt).length;
   $("#viewSaved").innerHTML=`
     <h2>Saved to hear</h2>
-    <p class="hint">Books with an Audible audiobook are listed first. BARD is the free Talking Books service for people with low vision.</p>
+    <p class="hint">Books with an Audible audiobook are listed first. Tap “More places to listen” for Chirp, Everand, Spotify and others.</p>
     ${list.length?`<ol>${list.map(b=>`<li>
       <div class="t"><mark>${esc(b.title)}</mark></div>
       <div class="a">${esc(b.author)}</div>
       ${audioLine(b)}
       ${b.about?`<div class="d">${esc(b.about)}</div>`:""}
       <div class="links">${b.audio==="yes"
-        ? `<a href="${esc(audibleUrl(b))}" target="_blank" rel="noopener">Get it on Audible</a>
-           <a class="alt" href="https://nlsbard.loc.gov/" target="_blank" rel="noopener">BARD</a>`
-        : `<a href="https://nlsbard.loc.gov/" target="_blank" rel="noopener">Try BARD</a>
-           <a class="alt" href="${esc(audibleUrl(b))}" target="_blank" rel="noopener">Search Audible</a>`}
-        <a class="lib" href="https://www.overdrive.com/search?q=${q(b.title+" "+lastName(b.author))}" target="_blank" rel="noopener">Library (Libby)</a>
-      </div></li>`).join("")}</ol>`:`<p class="hint" style="margin-top:16px">Nothing saved yet. Tap “Save / Haven't Heard” on a book to keep it here.</p>`}
+        ? `<a href="${esc(audibleUrl(b))}" target="_blank" rel="noopener">Get it on Audible</a>`
+        : `<a href="https://www.chirpbooks.com/search?query=${q(b.title+" "+lastName(b.author))}" target="_blank" rel="noopener">Try Chirp</a>
+           <a class="alt" href="https://www.everand.com/search?query=${q(b.title+" "+lastName(b.author))}" target="_blank" rel="noopener">Try Everand</a>`}
+      </div>
+      <details class="more"><summary>More places to listen</summary>
+        <div class="morelinks">${otherSources(b).filter(([n])=>b.audio==="yes" || !/^Chirp|^Everand/.test(n)).map(([n,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join("")}</div>
+      </details></li>`).join("")}</ol>`:`<p class="hint" style="margin-top:16px">Nothing saved yet. Tap “Save / Haven't Heard” on a book to keep it here.</p>`}
+    <div class="radio">
+      <h2>WWII radio and documentaries</h2>
+      <p class="hint">Free programs to listen to, not books.</p>
+      <div class="links">
+        <a class="alt" href="https://www.bbc.co.uk/sounds/search?q=second%20world%20war" target="_blank" rel="noopener">BBC Sounds</a>
+        <a class="alt" href="https://www.cbc.ca/listen/search?q=second%20world%20war" target="_blank" rel="noopener">CBC Listen</a>
+        <a class="alt" href="https://archive.org/details/oldtimeradio?query=world+war" target="_blank" rel="noopener">Old-time radio</a>
+      </div>
+    </div>
     <div class="send">
       <p style="margin:0 0 12px"><b>${pending ? `${pending} new answer${pending===1?"":"s"}` : "No new answers"}</b> since you last sent them to Erin.</p>
       <button id="sendBtn">Send my answers to Erin</button>
