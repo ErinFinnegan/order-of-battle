@@ -343,6 +343,53 @@
       ],
       "feel": "close",
       "about": "The 29th Infantry Division in Normandy, from Omaha Beach through the hedgerow battles to the capture of St. Lô."
+    },
+    {
+      "title": "The Forgotten 500",
+      "author": "Gregory A. Freeman",
+      "year": 2007,
+      "th": "M",
+      "br": "aaf",
+      "form": "history",
+      "tags": [
+        "bomber",
+        "rescue",
+        "oss",
+        "fifteenth-air-force"
+      ],
+      "feel": "close",
+      "about": "Operation Halyard, the 1944 rescue of more than 500 American airmen shot down over Nazi-occupied Yugoslavia, hidden by local fighters and flown out from a secret airstrip.",
+      "via": "Hardcover lists"
+    },
+    {
+      "title": "Submarine!",
+      "author": "Edward L. Beach",
+      "year": 1946,
+      "th": "P",
+      "br": "sub",
+      "form": "memoir",
+      "tags": [
+        "submarines",
+        "uss-trigger"
+      ],
+      "feel": "close",
+      "about": "Edward Beach's account of the U.S. submarine war, written just after it ended, mixing his own patrols on USS Trigger with the stories of other famous boats.",
+      "via": "Hardcover lists"
+    },
+    {
+      "title": "Operation Mincemeat",
+      "author": "Ben Macintyre",
+      "year": 2010,
+      "th": "M",
+      "br": "brit",
+      "form": "history",
+      "tags": [
+        "sicily",
+        "deception"
+      ],
+      "feel": "close",
+      "about": "The 1943 British scheme to float a dead man carrying fake invasion plans ashore in Spain, fooling Hitler about where the Allies would land. It was Sicily.",
+      "via": "Hardcover lists"
     }
   ],
   "audio": {
@@ -478,6 +525,12 @@
       "url": "https://www.audible.com/pd/Brave-Men-Audiobook/B0BW4V5SZ7",
       "note": "Some stores say this edition uses a computer voice."
     },
-    "war-as-i-knew-it-patton": {}
+    "war-as-i-knew-it-patton": {},
+    "forgotten-500-freeman": {
+      "url": "https://www.audible.com/pd/The-Forgotten-500-Audiobook/B002VA996I"
+    },
+    "operation-mincemeat-macintyre": {
+      "url": "https://www.audible.com/pd/Operation-Mincemeat-Audiobook/B003J9KXU6"
+    }
   }
 }
