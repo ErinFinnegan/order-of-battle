@@ -13,6 +13,28 @@ Open `index.html` in a browser. Run `node build.js` after editing `src/artifact.
 and the Claude features (descriptions, finding books) are off. The published claude.ai
 artifact has both.
 
+## Phone app (`phone/`)
+
+A simpler version for Dad's Android phone: one book at a time with a large description,
+and four big buttons: **Good Book**, **Read, Don't Remember**, **Pass**, and **Save /
+Haven't Heard**. No tags or scores on screen. A **Saved** tab lists what he wants to hear,
+with Libby, Hoopla and BARD buttons.
+
+- **Install:** open https://erinfinnegan.github.io/order-of-battle/phone/ in Chrome on the
+  phone, then menu (⋮) → **Add to Home screen** / **Install app**. It opens full-screen
+  from its own icon and works offline.
+- **Shelf:** built from his answers in the desktop app. Books his answers say won't land
+  are dropped, and new picks are added, in `phone/curation.json`. The phone keeps
+  learning as he answers and re-orders what's left.
+- **Answers stay on the phone** until he taps **Send my answers to Erin** on the Saved
+  tab. That opens Android's share sheet with a readable list plus a code. Paste the
+  whole message into the desktop app's **Find more** box and press either button to
+  bring the answers in.
+- **Refreshing his shelf:** export the shared database (ratings/, extra/, about/ as JSON
+  files), then run `node tools/build-phone-data.js <export-dir>` and push. The phone
+  picks up the new list the next time he opens the app. `tools/make-icons.py` redraws
+  the icons.
+
 ## The tabs
 
 - **Sort the shelf**: one book at a time, or the whole list. Each card shows a short

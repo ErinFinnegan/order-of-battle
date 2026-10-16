@@ -127,7 +127,7 @@ section.pane{padding-top:22px}
 
 /* stamps for verdicts */
 .stamp{font-family:var(--display); font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:14px; padding:2px 8px; border:2px solid currentColor; border-radius:3px; display:inline-block; transform:rotate(-3deg); white-space:nowrap}
-.stamp.up{color:var(--up)} .stamp.side{color:var(--side)} .stamp.down{color:var(--down)} .stamp.unread{color:var(--olive)} .stamp.nope,.stamp.read,.stamp.forgot,.stamp.nobattle{color:var(--muted)}
+.stamp.up{color:var(--up)} .stamp.side{color:var(--side)} .stamp.down{color:var(--down)} .stamp.unread{color:var(--olive)} .stamp.nope,.stamp.read,.stamp.forgot,.stamp.nobattle,.stamp.pass{color:var(--muted)}
 
 /* list views */
 .filters{display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; margin-bottom:14px}
@@ -462,10 +462,10 @@ const VERDICTS = [
   {s:"nope",    g:"new",  label:"Not this book",           key:"6"},
   {s:"nobattle",g:"new",  label:"Not this battle",         key:"7"},
 ];
-const STAMP = {up:"Liked", side:"So-so", down:"Disliked", unread:"Not yet heard", nope:"Not this book", nobattle:"Not this battle", read:"Already read", forgot:"Forgotten"};
+const STAMP = {up:"Liked", side:"So-so", down:"Disliked", unread:"Not yet heard", nope:"Not this book", nobattle:"Not this battle", read:"Already read", forgot:"Forgotten", pass:"Pass"};
 // how much each verdict says about his taste; "haven't heard it" says nothing, "already read" says a little
 // "not this book" is a light nudge; "not this battle" lands on the subject and theater only
-const VAL = {up:1, side:0.1, down:-1, nope:-0.2, read:0.25, forgot:0.2, nobattle:0};
+const VAL = {up:1, side:0.1, down:-1, nope:-0.2, pass:-0.4, read:0.25, forgot:0.2, nobattle:0};   // "pass" comes from the phone app
 const VAL_BY_GROUP = {nobattle:{tg:-1, th:-0.3}};
 const GROUP = {fe:{w:1.3,n:"Feel"}, th:{w:1.2,n:"Theater"}, br:{w:1.0,n:"Branch"}, fm:{w:1.0,n:"Kind of book"}, au:{w:1.6,n:"Author"}, era:{w:0.5,n:"When written"}, tg:{w:0.9,n:"Subject"}};
 const REASONS = ["Felt like the news, not action","Too dry / academic","Too much big-picture strategy","Not enough combat","Not enough Americans","Bad narrator","Too long","Too gory","Already knew the story"];
@@ -759,7 +759,7 @@ function afterBox(){
   </div>`;
 }
 
-const SHORT = {up:"Liked", side:"OK", down:"Disliked", forgot:"Forgot", unread:"Not heard", nope:"Not this book", nobattle:"Not this battle"};
+const SHORT = {up:"Liked", side:"OK", down:"Disliked", forgot:"Forgot", unread:"Not heard", nope:"Not this book", nobattle:"Not this battle", pass:"Pass (phone)"};
 function listView(){
   const f=norm(state.listFilter), want=state.listStatus;
   const all=allBooks();
@@ -767,7 +767,7 @@ function listView(){
   // a book you just re-answered stays in view until the filter changes, so it doesn't vanish mid-click
   const books=all.filter(b=>(!f || norm(b.title+" "+b.author).includes(f)) &&
     (want==="all" || state.listKeep.has(b.id) || (want==="none"?!status(b.id):status(b.id)===want))).sort((a,b)=>a.rank-b.rank);
-  const opts=[["all","All"],["none","Not sorted yet"],...VERDICTS.map(v=>[v.s,SHORT[v.s]]),["read","Marked read from a list"]].filter(([k])=>k==="all"||count(k)>0||k===want);
+  const opts=[["all","All"],["none","Not sorted yet"],...VERDICTS.map(v=>[v.s,SHORT[v.s]]),["pass",SHORT.pass],["read","Marked read from a list"]].filter(([k])=>k==="all"||count(k)>0||k===want);
   return `<p class="keyhint" style="margin:0 0 10px">Keyboard: <kbd>↑</kbd> <kbd>↓</kbd> move between books · <kbd>1</kbd>–<kbd>7</kbd> answer · <kbd>←</kbd> <kbd>→</kbd> then <kbd>Enter</kbd> also works</p>
   <div class="lbl">Show</div>
   <div class="seg statusseg" role="group" aria-label="Show books by answer" style="margin:6px 0 12px">${opts.map(([k,l])=>`<button data-lstatus="${k}" aria-pressed="${want===k}">${l} <span class="mono" style="font-size:13px">${count(k)}</span></button>`).join("")}</div>
@@ -896,6 +896,7 @@ function renderFind(){
 
     <h3 style="font-size:22px;margin-top:34px">Clear out what he's already read</h3>
     <p style="margin:6px 0 12px">Paste a list of titles — his Audible library, a list typed up from his old paperbacks, anything with one book per line. Matches get marked <span class="stamp read">Already read</span> so they never come up as recommendations. Anything not on the shelf is added and marked read too.</p>
+    <p style="margin:0 0 12px"><b>Answers from his phone:</b> when he sends you his answers from the phone app, paste the whole message here and press either button. The app spots the code at the end and brings in every answer.</p>
     <p style="margin:0 0 12px">Found an interesting list somewhere else, like a Goodreads shelf on the Battle of Britain? Copy the whole page, paste it here, and press <b>Add to the shelf to sort</b>. ${state.sample?"Claude picks the book titles out of the clutter":"Each line becomes a book"}, and they show up in “Sort the shelf” for him to go through.</p>
     <textarea id="paste" rows="6" placeholder="Band of Brothers&#10;With the Old Breed&#10;The Longest Day"></textarea>
     <div class="row" style="margin-top:8px"><button class="btn primary" id="importBtn">Mark these as read</button>
@@ -1093,6 +1094,29 @@ async function markRead(titles){
   return {matched, added};
 }
 
+// Answers sent from the phone app: "OOB1:" + base64 JSON of [id, answer, time, book?]
+async function importPhone(text){
+  const PHONE={good:"up", forgot:"forgot", pass:"pass", save:"unread"};
+  let rows;
+  try{ rows=JSON.parse(decodeURIComponent(escape(atob(text.match(/OOB1:([A-Za-z0-9+/=]+)/)[1])))); }
+  catch(e){ setStatus("importStatus","That code didn't read correctly. Paste the whole message from his phone."); return; }
+  const known=new Set(allBooks().map(b=>b.id));
+  let n=0, added=0;
+  for(const r of (Array.isArray(rows)?rows:[])){
+    const [id,s,at,book]=r; const mapped=PHONE[s];
+    if(typeof id!=="string" || !mapped) continue;
+    if(!known.has(id) && book && book.title){
+      await saveExtra({...book, id, tags:Array.isArray(book.tags)?book.tags.slice(0,6):[], found:true, foundAt:Date.now()}); known.add(id); added++;
+    }
+    if(!known.has(id)) continue;
+    const cur=state.ratings[id];
+    if(cur && (cur.at||0)>=(+at||0)) continue;     // keep whichever answer is newer
+    await saveRating(id,{s:mapped, reasons:[], at:+at||Date.now()}); n++;
+  }
+  render();
+  setStatus("importStatus",`Brought in ${n} answer${n===1?"":"s"} from his phone${added?`, and ${added} new book${added===1?"":"s"}`:""}.`);
+}
+
 async function addToShelf(){
   const text=$("#paste").value.trim();
   if(!text){ setStatus("importStatus","Paste a list first."); return; }
@@ -1152,6 +1176,7 @@ document.addEventListener("click", async e=>{
   if(t.hasAttribute("data-find-topic")) return findBooks("topic");
   if(t.hasAttribute("data-clear-topic")){ state.tonight={...state.tonight, topic:""}; lsSet("tonight",state.tonight); render(); return; }
   if(t.dataset.unavoid!==undefined){ const a=[...state.tonight.avoid]; a.splice(+t.dataset.unavoid,1); state.tonight={...state.tonight, avoid:a}; lsSet("tonight",state.tonight); render(); return; }
+  if((t.id==="addBtn"||t.id==="importBtn") && /OOB1:[A-Za-z0-9+/=]+/.test($("#paste").value)) return importPhone($("#paste").value);
   if(t.id==="addBtn") return addToShelf();
   if(t.dataset.moreBy) return findBooks("author", t.dataset.moreBy);
   if(t.id==="describe") return describe();

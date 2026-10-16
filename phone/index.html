@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Order of Battle</title>
+<meta name="theme-color" content="#4A5A26">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Stardos+Stencil:wght@700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,700&display=swap">
+<style>
+/* One book at a time, four huge buttons, nothing else. Built for a phone held in one hand
+   and for eyes that need big type. Same field-manual palette as the desktop app. */
+:root{
+  --paper:#E8E9DF; --card:#F6F6F0; --ink:#1D2118; --muted:#4F5646; --line:#C5C8B6;
+  --olive:#3F4D1F; --olive-ink:#F4F6EA; --good:#2E6A39; --pass:#A0342A; --hl:#FFC629; --hl-ink:#14170F;
+  --display:"Stardos Stencil", Impact, sans-serif; --body:"Source Serif 4", Georgia, serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root{
+  --paper:#13160F; --card:#1C2016; --ink:#ECEEE2; --muted:#B4BAA4; --line:#3A4130;
+  --olive:#B3C682; --olive-ink:#141710; --good:#86C892; --pass:#EE8A79; color-scheme:dark } }
+*{box-sizing:border-box}
+html,body{height:100%}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--body); font-size:20px; line-height:1.45;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
+button{font:inherit; color:inherit; -webkit-tap-highlight-color:transparent}
+.app{max-width:640px; margin:0 auto; padding-inline:16px; padding-block:12px 24px; min-height:100%; display:flex; flex-direction:column}
+
+header{display:flex; align-items:center; justify-content:space-between; gap:12px}
+header h1{font-family:var(--display); font-size:26px; margin:0; letter-spacing:.03em}
+.tabs{display:flex; gap:6px}
+.tabs button{border:2px solid var(--ink); background:transparent; border-radius:24px; padding:8px 16px; font-weight:700; font-size:18px; cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+
+.togo{margin-top:14px; font-size:17px; color:var(--muted)}
+.book{flex:1; margin-top:8px}
+.book h2{margin:0; font-size:clamp(30px,8.4vw,42px); line-height:1.12; text-wrap:balance}
+.book h2 mark{background:var(--hl); color:var(--hl-ink); padding:0 .18em; -webkit-box-decoration-break:clone; box-decoration-break:clone; border-radius:4px}
+.book .by{font-size:23px; margin-top:10px}
+.book .about{font-size:20px; margin-top:14px; color:var(--ink)}
+
+.choices{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:22px; position:sticky; bottom:calc(10px + env(safe-area-inset-bottom,0px)); background:var(--paper); padding-top:8px}
+.choice{min-height:104px; border-radius:14px; border:3px solid var(--line); background:var(--card); cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:10px 6px; font-weight:700; font-size:21px; line-height:1.15; text-align:center}
+.choice svg{width:38px; height:38px}
+.choice.good{color:var(--good)} .choice.pass{color:var(--pass)}
+.choice:active{transform:scale(.97)}
+.choice:focus-visible, .choice.kb:focus{background:var(--hl); color:var(--hl-ink); border-color:var(--hl-ink); outline:5px solid var(--ink); outline-offset:3px}
+.below{display:flex; justify-content:center; margin-top:14px; min-height:52px}
+.undo{border:2px solid var(--ink); background:transparent; border-radius:10px; padding:10px 22px; font-size:19px; font-weight:700; cursor:pointer}
+.undo:focus-visible{background:var(--hl); color:var(--hl-ink); outline:4px solid var(--ink)}
+.toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(140px + env(safe-area-inset-bottom,0px)); background:var(--ink); color:var(--paper); padding:12px 22px; border-radius:10px; font-size:19px; font-weight:700; pointer-events:none; max-width:calc(100% - 32px); text-align:center}
+
+/* saved list */
+.saved h2{font-size:26px; margin:20px 0 4px}
+.saved .hint{color:var(--muted); font-size:18px; margin:0}
+.saved ol{list-style:none; margin:0; padding:0}
+.saved li{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-top:14px}
+.saved .t{font-size:clamp(25px,7vw,32px); font-weight:700; line-height:1.15}
+.saved .t mark{background:var(--hl); color:var(--hl-ink); padding:0 .18em; -webkit-box-decoration-break:clone; box-decoration-break:clone; border-radius:4px}
+.saved .a{font-size:21px; margin-top:4px}
+.saved .d{font-size:18px; color:var(--muted); margin-top:6px}
+.links{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+.links a{display:inline-flex; align-items:center; min-height:50px; padding:10px 16px; border-radius:8px; background:var(--olive); color:var(--olive-ink); text-decoration:none; font-weight:700; font-size:19px}
+.links a.alt{background:transparent; color:var(--ink); border:2px solid var(--ink)}
+.send{margin-top:28px; padding:18px; border:2px dashed var(--line); border-radius:10px}
+.send button{width:100%; min-height:64px; border-radius:10px; border:none; background:var(--olive); color:var(--olive-ink); font-size:21px; font-weight:700; cursor:pointer}
+.send textarea{width:100%; margin-top:12px; font-size:14px; padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--ink)}
+.done{text-align:center; margin-top:40px; font-size:22px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Order of Battle</h1>
+    <nav class="tabs" aria-label="Views">
+      <button id="tabBooks" aria-pressed="true">Books</button>
+      <button id="tabSaved" aria-pressed="false">Saved</button>
+    </nav>
+  </header>
+
+  <section id="viewBooks" aria-live="polite"></section>
+  <section id="viewSaved" class="saved" hidden></section>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="data.js"></script>
+<script>
+"use strict";
+const D = window.OOB_DATA;
+
+/* ---------- learning (same method as the desktop app, trimmed) ---------- */
+// Each answer nudges a score for every feature of that book; scores are shrunk toward zero.
+const VAL = {up:1, good:1, side:0.1, down:-1, nope:-0.2, pass:-0.4, read:0.25, forgot:0.2, nobattle:0};
+const VAL_BY_GROUP = {nobattle:{tg:-1, th:-0.3}};
+const WEIGHT = {fe:1.3, th:1.2, br:1, fm:1, au:1.6, era:0.5, tg:0.9};
+const ERA = y => !y ? null : y<1960 ? "wartime" : y<1980 ? "60s70s" : y<2000 ? "80s90s" : y<2015 ? "2000s" : "recent";
+function features(b){
+  const f=[];
+  if(b.feel) f.push("fe:"+b.feel);
+  if(b.th) f.push("th:"+b.th);
+  if(b.br) f.push("br:"+b.br);
+  if(b.form) f.push("fm:"+b.form);
+  String(b.author||"").split("&").forEach(a=>f.push("au:"+a.trim()));
+  if(ERA(b.year)) f.push("era:"+ERA(b.year));
+  (b.tags||[]).forEach(t=>f.push("tg:"+t));
+  return f;
+}
+function affinity(answers){
+  const acc={};
+  const add=(b,s)=>{
+    if(VAL[s]===undefined) return;
+    for(const f of features(b)){
+      const g=f.slice(0,f.indexOf(":"));
+      const v=VAL_BY_GROUP[s]?.[g] ?? VAL[s];
+      if(v===0) continue;
+      (acc[f] ||= {sum:0,n:0}); acc[f].sum+=v; acc[f].n++;
+    }
+  };
+  D.history.forEach(b=>add(b,b.s));
+  D.shelf.forEach(b=>{ if(answers[b.id]) add(b,answers[b.id].s); });
+  const out={}; for(const [f,a] of Object.entries(acc)) out[f]=a.sum/(a.n+2);
+  return out;
+}
+function score(b,aff){
+  const groups={};
+  for(const f of features(b)){ const g=f.slice(0,f.indexOf(":")); (groups[g] ||= []).push(aff[f]||0); }
+  let t=0,w=0; for(const [g,vals] of Object.entries(groups)){ t+=WEIGHT[g]*vals.reduce((a,c)=>a+c,0)/vals.length; w+=WEIGHT[g]; }
+  return w ? t/w : 0;
+}
+
+/* ---------- state, kept on this phone ---------- */
+const KEY="oobp:answers", SENT="oobp:sent";
+function load(k,d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d; }catch(e){ return d; } }
+function save(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+let answers = load(KEY,{});
+let sentAt = load(SENT,0);
+let last = null;            // {id, prev} for Undo
+let view = "books";
+let kb = false;             // true once he uses the keyboard, so the highlight shows
+let sel = 0;
+try{ navigator.storage?.persist?.(); }catch(e){}
+
+const CHOICES = [
+  {s:"good",   label:"Good Book",               cls:"good", key:"1",
+   icon:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>'},
+  {s:"forgot", label:"Read, Don't Remember",    cls:"",     key:"2",
+   icon:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>'},
+  {s:"pass",   label:"Pass",                    cls:"pass", key:"3",
+   icon:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 0 1 6.3 12.9L7.1 5.7A8 8 0 0 1 12 4zM4 12c0-1.8.6-3.5 1.7-4.9l11.2 11.2A8 8 0 0 1 4 12z"/></svg>'},
+  {s:"save",   label:"Save / Haven't Heard",    cls:"",     key:"4",
+   icon:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>'},
+];
+const DONE_MSG = {good:"Marked as a good book", forgot:"Marked read, doesn't remember", pass:"Passed", save:"Saved for later"};
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const q = s => encodeURIComponent(s);
+const lastName = a => String(a).split("&")[0].trim().split(/\s+/).filter(w=>!/^(jr\.?|sr\.?|ii|iii)$/i.test(w)).pop() || a;
+let toastT;
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,1800); }
+
+function queue(){
+  const aff=affinity(answers);
+  return D.shelf.filter(b=>!answers[b.id]).map(b=>({b,sc:score(b,aff)})).sort((x,y)=>y.sc-x.sc).map(x=>x.b);
+}
+function savedBooks(){
+  const fromPhone=D.shelf.filter(b=>answers[b.id]?.s==="save").sort((a,b)=>answers[b.id].at-answers[a.id].at);
+  const earlier=D.history.filter(b=>b.s==="unread");
+  return [...fromPhone, ...earlier];
+}
+
+/* ---------- views ---------- */
+function renderBooks(){
+  const list=queue(), b=list[0];
+  const el=$("#viewBooks");
+  if(!b){
+    el.innerHTML=`<div class="done"><p><b>That's every book for now.</b></p><p>Check the Saved list, and send your answers to Erin so she can find more.</p></div>${undoHtml()}`;
+    return;
+  }
+  el.innerHTML=`
+    <div class="togo">${list.length} book${list.length===1?"":"s"} to go</div>
+    <article class="book" data-id="${esc(b.id)}">
+      <h2><mark>${esc(b.title)}</mark></h2>
+      <div class="by">${esc(b.author)}${b.year?` · ${b.year}`:""}</div>
+      ${b.about?`<p class="about">${esc(b.about)}</p>`:""}
+    </article>
+    <div class="choices" role="group" aria-label="Your answer">
+      ${CHOICES.map((c,i)=>`<button class="choice ${c.cls}${kb?" kb":""}" data-s="${c.s}" data-i="${i}">${c.icon}<span>${c.label}</span></button>`).join("")}
+    </div>
+    ${undoHtml()}`;
+  if(kb) el.querySelectorAll(".choice")[sel]?.focus();
+}
+function undoHtml(){
+  if(!last) return `<div class="below"></div>`;
+  const b=D.shelf.find(x=>x.id===last.id);
+  return `<div class="below"><button class="undo" id="undo">Undo “${esc(b ? (b.title.length>28 ? b.title.slice(0,26)+"…" : b.title) : "last")}”</button></div>`;
+}
+
+function renderSaved(){
+  const list=savedBooks();
+  const pending=Object.values(answers).filter(a=>a.at>sentAt).length;
+  $("#viewSaved").innerHTML=`
+    <h2>Saved to hear</h2>
+    <p class="hint">Libby and Hoopla are free with a library card. BARD is the free Talking Books service.</p>
+    ${list.length?`<ol>${list.map(b=>`<li>
+      <div class="t"><mark>${esc(b.title)}</mark></div>
+      <div class="a">${esc(b.author)}</div>
+      ${b.about?`<div class="d">${esc(b.about)}</div>`:""}
+      <div class="links">
+        <a href="https://www.overdrive.com/search?q=${q(b.title+" "+lastName(b.author))}" target="_blank" rel="noopener">Libby</a>
+        <a href="https://www.hoopladigital.com/search?q=${q(b.title)}&amp;type=direct" target="_blank" rel="noopener">Hoopla</a>
+        <a class="alt" href="https://nlsbard.loc.gov/" target="_blank" rel="noopener">BARD</a>
+      </div></li>`).join("")}</ol>`:`<p class="hint" style="margin-top:16px">Nothing saved yet. Tap “Save / Haven't Heard” on a book to keep it here.</p>`}
+    <div class="send">
+      <p style="margin:0 0 12px"><b>${pending ? `${pending} new answer${pending===1?"":"s"}` : "No new answers"}</b> since you last sent them to Erin.</p>
+      <button id="sendBtn">Send my answers to Erin</button>
+      <textarea id="sendText" rows="5" readonly hidden aria-label="Answers to copy"></textarea>
+    </div>`;
+}
+function render(){
+  $("#tabBooks").setAttribute("aria-pressed", String(view==="books"));
+  $("#tabSaved").setAttribute("aria-pressed", String(view==="saved"));
+  $("#tabSaved").textContent = `Saved (${savedBooks().length})`;
+  $("#viewBooks").hidden = view!=="books";
+  $("#viewSaved").hidden = view!=="saved";
+  view==="books" ? renderBooks() : renderSaved();
+}
+
+/* ---------- actions ---------- */
+function answer(s){
+  const card=$(".book"); if(!card) return;
+  const id=card.dataset.id;
+  last={id, prev:answers[id]||null};
+  answers[id]={s, at:Date.now()};
+  save(KEY,answers);
+  toast(DONE_MSG[s]);
+  render();
+}
+function undo(){
+  if(!last) return;
+  if(last.prev) answers[last.id]=last.prev; else delete answers[last.id];
+  save(KEY,answers); last=null; toast("Undone"); render();
+}
+
+// The message to Erin: readable lines for her, plus a code the desktop app imports.
+function buildMessage(all){
+  const picked=Object.entries(answers).filter(([,a])=>all || a.at>sentAt);
+  const byS={good:[],forgot:[],pass:[],save:[]};
+  const books=Object.fromEntries(D.shelf.map(b=>[b.id,b]));
+  for(const [id,a] of picked){ const b=books[id]; if(b && byS[a.s]) byS[a.s].push(`${b.title} (${lastName(b.author)})`); }
+  const code=picked.map(([id,a])=>{ const b=books[id]; const rec=[id,a.s,a.at];
+    if(b?.isNew) rec.push({title:b.title,author:b.author,year:b.year,th:b.th,br:b.br,form:b.form,tags:b.tags,feel:b.feel,about:b.about});
+    return rec; });
+  const lines=["Dad's book answers from Order of Battle:"];
+  if(byS.good.length) lines.push("Good: "+byS.good.join("; "));
+  if(byS.save.length) lines.push("Saved: "+byS.save.join("; "));
+  if(byS.forgot.length) lines.push("Read, doesn't remember: "+byS.forgot.join("; "));
+  if(byS.pass.length) lines.push("Pass: "+byS.pass.join("; "));
+  lines.push("", "OOB1:"+btoa(unescape(encodeURIComponent(JSON.stringify(code)))));
+  return {text:lines.join("\n"), count:picked.length};
+}
+async function send(){
+  const pending=Object.values(answers).some(a=>a.at>sentAt);
+  const {text,count}=buildMessage(!pending);
+  if(!count){ toast("No answers yet"); return; }
+  let shared=false;
+  if(navigator.share){
+    try{ await navigator.share({title:"Dad's book answers", text}); shared=true; }
+    catch(e){ if(e.name==="AbortError") return; }
+  }
+  if(!shared){
+    const ta=$("#sendText"); ta.hidden=false; ta.value=text; ta.select();
+    try{ await navigator.clipboard.writeText(text); toast("Copied. Paste it into a text to Erin."); }
+    catch(e){ toast("Copy the text below and send it to Erin"); }
+  }
+  sentAt=Date.now(); save(SENT,sentAt);
+  if(shared){ toast("Sent"); render(); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e=>{
+  const t=e.target.closest("button"); if(!t) return;
+  if(t.id==="tabBooks"){ view="books"; render(); return; }
+  if(t.id==="tabSaved"){ view="saved"; render(); window.scrollTo(0,0); return; }
+  if(t.id==="undo"){ undo(); return; }
+  if(t.id==="sendBtn"){ send(); return; }
+  if(t.dataset.s){ if(t.dataset.i) sel=+t.dataset.i; answer(t.dataset.s); }
+});
+document.addEventListener("keydown", e=>{
+  if(view!=="books" || e.metaKey||e.ctrlKey||e.altKey) return;
+  const c=CHOICES.find(c=>c.key===e.key);
+  if(c){ e.preventDefault(); kb=true; sel=CHOICES.indexOf(c); answer(c.s); return; }
+  if(e.key==="Backspace" || e.key==="u"){ e.preventDefault(); undo(); return; }
+  const btns=[...document.querySelectorAll(".choice")]; if(!btns.length) return;
+  if(document.activeElement?.id==="undo"){
+    if(e.key==="ArrowUp"){ e.preventDefault(); btns[Math.max(2,sel)].focus(); }
+    else if(e.key==="ArrowDown") e.preventDefault();
+    return;
+  }
+  const cur=btns.indexOf(document.activeElement);
+  const move={ArrowLeft:-1, ArrowRight:1, ArrowUp:-2, ArrowDown:2}[e.key];
+  if(move!==undefined){
+    e.preventDefault(); kb=true;
+    if(cur<0){ sel=Math.min(sel,3); }
+    else if(e.key==="ArrowDown" && cur>=2){ $("#undo")?.focus(); return; }
+    else { const n=cur+move; if(n>=0 && n<4) sel=n; }
+    btns.forEach(b=>b.classList.add("kb")); btns[sel].focus();
+  }
+});
+
+render();
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
