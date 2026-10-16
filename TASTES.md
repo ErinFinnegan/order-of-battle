@@ -9,7 +9,9 @@ He wants the war told like an action movie: a storyteller following specific men
 through one big, decisive operation. D-Day, Market Garden, Iwo Jima, the destroyers at
 Samar, the carrier war and the bomber crews are his ground. Sweeping overviews feel
 "like watching the news" to him, and first-person enlisted memoirs mostly miss. He has
-read a great deal, so many "passes" just mean he's already covered that battle.
+read a great deal, so many "passes" just mean he's already covered that battle. Two
+tones turn him off: **too sentimental** (hometown "band of brothers" stories) and **too
+brutal** (long POW-camp survival ordeals).
 
 ## In his own words
 
@@ -20,6 +22,12 @@ read a great deal, so many "passes" just mean he's already covered that battle.
 - He has read a lot on the Battle of Britain, but a Goodreads list of titles was new to
   him and he found it interesting.
 - He likes to pick a specific battle for the evening. Leyte Gulf was one.
+- Some books are **"too sentimental."** *Band of Brothers* was one. Another was a
+  "brothers" book that follows a group from high school into the war and home again;
+  *The Bedford Boys* and *Brothers in Battle, Best of Friends* both fit that description
+  and both got a thumbs down.
+- Some are **"too brutal."** Japanese POW-camp survival stories were a slog to get
+  through.
 
 ## What he likes
 
@@ -49,8 +57,14 @@ over Europe; Toll's carrier war.
 - **Dense, big-picture histories.** Atkinson's trilogy and three Hornfischer books were
   only "OK." Passed on *Shattered Sword*, Frank's *Guadalcanal* and *The Rising Sun*.
 - **The Battle of the Bulge and Guadalcanal.** Most books on either got a pass or worse.
-- **Japanese-side or analytical takes,** oral-history collections, and POW/survival
-  stories (*Unbroken*, *As Good As Dead*).
+- **Too sentimental.** Stories built around friendship and hometown loss: *Band of
+  Brothers* and its spin-offs, *The Bedford Boys*, *Brothers in Battle, Best of
+  Friends*. He wants the action, not the eulogy.
+- **Too brutal.** Long prison-camp and survival ordeals, especially Japanese POW camps:
+  *Unbroken*, *As Good As Dead*. *Ghost Soldiers* (the raid that freed POWs) was only
+  "OK." A rescue or an escape told as an operation is probably fine; months of
+  suffering in a camp is not.
+- **Japanese-side or analytical takes** and oral-history collections.
 
 ## Battles he's probably done
 
@@ -85,6 +99,9 @@ Fortresses*).
   untested. McManus's trilogy is on his shelf to find out.
 - Submarine memoirs (O'Kane, Fluckey) are untested. *Escape from the Deep* was a
   "read, don't remember."
+- Where's the line on "too brutal"? *The Forgotten 500* (a rescue of downed airmen) is
+  on his shelf as a test. *Lightning Down* (a P-38 pilot sent to Buchenwald) was taken
+  off his phone shelf for now.
 - Some of his "Not this book" answers may mean "not this battle." He and Erin planned to
   go back through them in the desktop app's Whole list view.
 
